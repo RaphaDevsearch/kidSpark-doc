@@ -3,31 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Design System Analysis — Notion AI → kidSpark</title>
+<title>kidSpark — Design System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fredoka:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FFFFFF; --surface:#F7F7F5; --elevated:#FFFFFF;
-    --text:#191919; --text-2:#5F5E5B; --text-3:#9B9A97;
-    --border:#EDECEA;
-    --action:#191919;
-    --ai-a:#9A6DFF; --ai-b:#6366F1;
-    --spark:#E8A100; --spark-bg:#FFF7E0;
-    --success:#2F9E44; --warning:#F0A400; --error:#E03131;
+    --primary:#FF8A3D;
+    --secondary:#4D96FF;
+    --accent:#FFD93D;
+    --success:#6BCB77;
+    --creativity:#9B5DE5;
+    --friendly:#FF6B9A;
+    --background:#FFF9E8;
+    --surface:#FFFFFF;
+    --text:#263238;
+    --text-2:#4A555E;
+    --muted:#6B7280;
+    --border:#F0E6CC;
     --code-bg:#1E1E1E; --code-bar:#2D2D2D;
-    --r-sm:4px; --r-md:8px; --r-lg:12px;
-    --sh-sm:0 1px 2px rgba(0,0,0,.05);
-    --sh-md:0 4px 12px rgba(0,0,0,.08);
-    --sh-lg:0 12px 32px rgba(0,0,0,.12);
+    --r-sm:8px; --r-md:12px; --r-lg:20px;
+    --sh-sm:0 2px 6px rgba(255,138,61,.12);
+    --sh-md:0 6px 18px rgba(255,138,61,.16);
+    --sh-lg:0 18px 40px rgba(255,138,61,.20);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{ scroll-behavior:smooth; }
-  body{ font-family:'Inter',system-ui,sans-serif; color:var(--text); background:var(--bg); font-size:15px; line-height:1.6; }
+  body{ font-family:'Inter',system-ui,sans-serif; color:var(--text); background:var(--background); font-size:15px; line-height:1.6; }
   .mono{ font-family:'JetBrains Mono', monospace; }
   .disp{ font-family:'Fredoka','Inter',sans-serif; }
   a{ color:inherit; text-decoration:none; }
-  ::selection{ background:var(--spark-bg); }
+  ::selection{ background:var(--accent); }
 
   /* ===== SHELL ===== */
   .shell{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
@@ -38,68 +43,72 @@
     background:var(--surface); border-right:1px solid var(--border);
     padding:20px 12px 40px;
   }
-  /* Mobile: sidebar becomes an off-canvas drawer instead of disappearing */
   @media (max-width:900px){
     .sidebar{
       position:fixed; top:0; left:0; height:100dvh; width:80%; max-width:300px; z-index:60;
       transform:translateX(-100%); transition:transform .22s ease; box-shadow:var(--sh-lg);
+      padding-top:max(20px, env(safe-area-inset-top)); padding-bottom:max(40px, env(safe-area-inset-bottom));
     }
     .sidebar.open{ transform:translateX(0); }
   }
   .drawer-backdrop{
-    display:none; position:fixed; inset:0; background:rgba(11,13,23,.4); z-index:55;
+    display:none; position:fixed; inset:0; background:rgba(38,50,56,.45); z-index:55;
     opacity:0; transition:opacity .2s ease;
   }
   .drawer-backdrop.open{ display:block; opacity:1; }
 
   .brand{ display:flex; align-items:center; gap:8px; padding:8px 10px 18px; }
-  .brand-mark{ width:24px; height:24px; border-radius:6px; background:var(--text); display:flex; align-items:center; justify-content:center; }
-  .brand-name{ font-weight:700; font-size:14px; }
-  .brand-sub{ font-size:11px; color:var(--text-3); margin-left:2px; }
+  .brand-mark{ width:26px; height:26px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; }
+  .brand-name{ font-family:'Fredoka'; font-weight:600; font-size:15px; }
+  .brand-sub{ font-size:11px; color:var(--muted); margin-left:2px; }
 
   .nav-group{ margin-top:18px; }
-  .nav-label{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--text-3); padding:0 10px 6px; }
+  .nav-label{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); padding:0 10px 6px; }
   .nav-item{
-    display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:6px;
-    font-size:13.5px; color:var(--text-2); cursor:pointer; transition:background .12s;
+    display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:8px;
+    font-size:13.5px; color:var(--text-2); cursor:pointer; transition:background .12s, color .12s;
   }
-  .nav-item:hover{ background:#EFEFED; color:var(--text); }
-  .nav-item.active{ background:#EAEAE8; color:var(--text); font-weight:600; }
-  .nav-num{ font-size:10.5px; color:var(--text-3); width:16px; flex-shrink:0; }
+  @media (max-width:900px){ .nav-item{ padding:12px 10px; font-size:14.5px; } }
+  .nav-item:hover{ background:rgba(255,138,61,.10); color:var(--text); }
+  .nav-item.active{ background:rgba(255,138,61,.16); color:var(--primary); font-weight:700; }
+  .nav-num{ font-size:10.5px; color:var(--muted); width:16px; flex-shrink:0; }
 
   .main{ min-width:0; }
   .topbar{
     position:sticky; top:0; z-index:20; height:52px; display:flex; align-items:center; justify-content:space-between;
-    padding:0 40px; border-bottom:1px solid var(--border); background:rgba(255,255,255,.85); backdrop-filter:blur(8px); gap:10px;
+    padding:0 40px; padding-left:max(40px, env(safe-area-inset-left));
+    border-bottom:1px solid var(--border); background:rgba(255,249,232,.85); backdrop-filter:blur(8px); gap:10px;
   }
-  @media (max-width:900px){ .topbar{ padding:0 14px; } }
+  @media (max-width:900px){ .topbar{ padding:0 14px; padding-left:max(14px, env(safe-area-inset-left)); } }
   .hamburger{
-    display:none; width:32px; height:32px; border-radius:7px; align-items:center; justify-content:center;
-    border:1px solid var(--border); background:#fff; flex-shrink:0; cursor:pointer;
+    display:none; width:44px; height:44px; border-radius:9px; align-items:center; justify-content:center;
+    border:1px solid var(--border); background:var(--surface); flex-shrink:0; cursor:pointer; margin-left:-6px;
+    font:inherit; padding:0;
   }
+  .hamburger:active{ background:rgba(255,138,61,.10); }
   @media (max-width:900px){ .hamburger{ display:flex; } }
-  .crumb{ font-size:13px; color:var(--text-3); display:flex; align-items:center; gap:6px; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .crumb{ font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
   .crumb b{ color:var(--text); font-weight:600; }
   @media (max-width:640px){ .crumb span{ display:none; } .crumb b{ font-size:12.5px; } }
-  .pill{ font-size:12px; padding:5px 10px; border:1px solid var(--border); border-radius:100px; color:var(--text-2); flex-shrink:0; white-space:nowrap; }
+  .pill{ font-size:12px; padding:5px 10px; border:1px solid var(--border); border-radius:100px; color:var(--text-2); flex-shrink:0; white-space:nowrap; background:var(--surface); }
   @media (max-width:480px){ .pill{ display:none; } }
 
   .content{ max-width:820px; margin:0 auto; padding:56px 40px 120px; }
   @media (max-width:640px){ .content{ padding:32px 18px 80px; } }
   @media (max-width:380px){ .content{ padding:28px 14px 70px; } }
 
-  .doc-title{ font-size:clamp(26px,7vw,38px); font-weight:800; letter-spacing:-.01em; margin-bottom:10px; line-height:1.12; }
+  .doc-title{ font-family:'Fredoka'; font-size:clamp(26px,7vw,38px); font-weight:600; letter-spacing:-.01em; margin-bottom:10px; line-height:1.12; }
   .doc-sub{ font-size:15.5px; color:var(--text-2); max-width:640px; margin-bottom:28px; }
 
   .callout{
-    display:flex; gap:12px; background:var(--spark-bg); border:1px solid #F0DBA0; border-radius:var(--r-md);
-    padding:16px 18px; font-size:14px; color:#6B4E00; margin-bottom:48px; line-height:1.6;
+    display:flex; gap:12px; background:rgba(255,217,61,.28); border:1px solid #F0D26A; border-radius:var(--r-md);
+    padding:16px 18px; font-size:14px; color:#6B4E00; margin-bottom:20px; line-height:1.6;
   }
 
   section.sec{ padding:56px 0; border-top:1px solid var(--border); }
   section.sec:first-of-type{ border-top:none; padding-top:0; }
-  .sec-eyebrow{ font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ai-b); margin-bottom:8px; }
-  .sec-title{ font-size:26px; font-weight:700; margin-bottom:16px; letter-spacing:-.01em; }
+  .sec-eyebrow{ font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--secondary); margin-bottom:8px; }
+  .sec-title{ font-family:'Fredoka'; font-size:25px; font-weight:600; margin-bottom:16px; letter-spacing:-.01em; }
   .sec-body{ color:var(--text-2); font-size:15px; line-height:1.7; margin-bottom:20px; }
   .sec-body b{ color:var(--text); font-weight:600; }
 
@@ -111,40 +120,41 @@
   @media (max-width:640px){ .grid-2,.grid-3,.grid-4{ grid-template-columns:1fr 1fr; } }
   @media (max-width:420px){ .grid-2,.grid-3,.grid-4{ grid-template-columns:1fr; } }
 
-  .card{ background:var(--elevated); border:1px solid var(--border); border-radius:var(--r-lg); padding:18px; }
-  .card-title{ font-weight:600; font-size:14px; margin-bottom:4px; }
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:18px; }
+  .card-title{ font-weight:700; font-size:14px; margin-bottom:4px; color:var(--text); }
   .card-desc{ font-size:13px; color:var(--text-2); line-height:1.55; }
 
   /* ===== SWATCHES ===== */
-  .swatch{ border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:#fff; }
+  .swatch{ border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:var(--surface); }
   .swatch-fill{ height:64px; }
   .swatch-meta{ padding:10px 12px; }
-  .swatch-name{ font-size:12.5px; font-weight:600; }
-  .swatch-hex{ font-size:11.5px; color:var(--text-3); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+  .swatch-name{ font-size:12.5px; font-weight:700; }
+  .swatch-role{ font-size:11px; color:var(--muted); margin-top:1px; }
+  .swatch-hex{ font-size:11.5px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:2px; }
 
   /* ===== TYPE SCALE ===== */
   .type-row{ display:flex; align-items:baseline; justify-content:space-between; gap:24px; padding:16px 0; border-bottom:1px solid var(--border); }
   .type-row:last-child{ border-bottom:none; }
-  .type-meta{ font-size:12px; color:var(--text-3); font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+  .type-meta{ font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace; white-space:nowrap; }
 
   /* ===== SPACING BARS ===== */
   .space-row{ display:flex; align-items:center; gap:16px; padding:8px 0; }
-  .space-bar{ height:10px; background:var(--ai-b); border-radius:3px; }
+  .space-bar{ height:10px; background:var(--primary); border-radius:4px; }
   .space-label{ width:110px; font-size:12.5px; font-family:'JetBrains Mono',monospace; color:var(--text-2); flex-shrink:0; }
-  .space-px{ font-size:12px; color:var(--text-3); }
+  .space-px{ font-size:12px; color:var(--muted); }
 
   /* ===== WIREFRAME ===== */
-  .wireframe{ border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:#FAFAF9; }
-  .wf-top{ height:36px; background:#fff; border-bottom:1px dashed #C9C7C2; display:flex; align-items:center; padding:0 14px; font-size:10.5px; color:var(--text-3); font-family:'JetBrains Mono',monospace; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .wireframe{ border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:var(--surface); }
+  .wf-top{ height:36px; background:#FFF; border-bottom:1px dashed #E3D6A6; display:flex; align-items:center; padding:0 14px; font-size:10.5px; color:var(--muted); font-family:'JetBrains Mono',monospace; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
   .wf-body{ display:grid; grid-template-columns:130px 1fr; min-height:220px; }
   @media (max-width:520px){ .wf-body{ grid-template-columns:1fr; min-height:auto; } }
-  .wf-side{ background:#F0F0EE; border-right:1px dashed #C9C7C2; padding:12px; font-size:11px; color:var(--text-3); font-family:'JetBrains Mono',monospace; }
-  @media (max-width:520px){ .wf-side{ border-right:none; border-bottom:1px dashed #C9C7C2; } }
+  .wf-side{ background:#FFF7E4; border-right:1px dashed #E3D6A6; padding:12px; font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+  @media (max-width:520px){ .wf-side{ border-right:none; border-bottom:1px dashed #E3D6A6; } }
   .wf-side div{ padding:5px 0; }
   .wf-main{ display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; padding:20px; }
-  .wf-main-box{ width:70%; height:14px; background:#E4E3DF; border-radius:3px; }
-  .wf-main-box.title{ width:45%; height:20px; background:#D8D7D2; }
-  .wf-tag{ font-size:11px; color:var(--text-3); font-family:'JetBrains Mono',monospace; margin-top:10px; text-align:center; }
+  .wf-main-box{ width:70%; height:14px; background:#FFE1BC; border-radius:4px; }
+  .wf-main-box.title{ width:45%; height:20px; background:#FFCB93; }
+  .wf-tag{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:10px; text-align:center; }
 
   /* ===== EDITOR / CODE ===== */
   .editor{ border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--sh-md); margin:20px 0; }
@@ -161,78 +171,46 @@
   .c-prop{ color:#9CDCFE; }
   .c-val{ color:#CE9178; }
   .c-key{ color:#569CD6; }
-  .c-punc{ color:#D4D4D4; }
   .c-sel{ color:#D7BA7D; }
 
-  /* ===== STATE ROW (components) ===== */
+  /* ===== STATE ROW ===== */
   .state-row{ display:flex; flex-wrap:wrap; gap:12px; margin:14px 0 24px; }
   .state-item{ display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .state-label{ font-size:11px; color:var(--text-3); font-family:'JetBrains Mono',monospace; }
+  .state-label{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
 
-  .btn{ height:34px; padding:0 16px; border-radius:var(--r-md); font-size:13.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .btn-default{ background:var(--action); color:#fff; }
-  .btn-default:hover{ opacity:.88; }
-  .btn-hover{ background:var(--action); color:#fff; opacity:.88; }
-  .btn-active{ background:#000; color:#fff; transform:scale(.97); }
-  .btn-disabled{ background:#E4E3DF; color:#B3B1AC; cursor:not-allowed; }
+  .btn{ height:36px; padding:0 18px; border-radius:100px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .btn-default{ background:var(--primary); color:#fff; }
+  .btn-default:hover{ background:#EF7A2C; }
+  .btn-hover{ background:#EF7A2C; color:#fff; }
+  .btn-active{ background:#DD6C1F; color:#fff; transform:scale(.97); }
+  .btn-disabled{ background:#F0E6CC; color:#B9AE8E; cursor:not-allowed; }
 
-  .sb-item{ height:34px; padding:0 14px; border-radius:var(--r-md); font-size:13.5px; display:flex; align-items:center; gap:8px; width:140px; color:var(--text-2); }
+  .sb-item{ height:36px; padding:0 14px; border-radius:10px; font-size:13.5px; display:flex; align-items:center; gap:8px; width:140px; color:var(--text-2); }
   .sb-default{ background:transparent; }
-  .sb-hover{ background:#EFEFED; color:var(--text); }
-  .sb-active{ background:#EAEAE8; color:var(--text); font-weight:600; }
-  .sb-focus{ background:transparent; box-shadow:0 0 0 2px #6366F1; }
+  .sb-hover{ background:rgba(255,138,61,.10); color:var(--text); }
+  .sb-active{ background:rgba(255,138,61,.16); color:var(--primary); font-weight:700; }
+  .sb-focus{ background:transparent; box-shadow:0 0 0 2px var(--secondary); }
 
   /* ===== ICON ROW ===== */
   .icon-row{ display:flex; gap:28px; align-items:center; flex-wrap:wrap; margin:14px 0 24px; }
   .icon-item{ display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .icon-box{ width:44px; height:44px; border:1px solid var(--border); border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; }
+  .icon-box{ width:44px; height:44px; border:1px solid var(--border); border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; background:var(--surface); }
 
-  /* ===== BORDER/RADIUS/SHADOW ROW ===== */
+  /* ===== TOKEN ROW ===== */
   .token-row{ display:flex; gap:16px; flex-wrap:wrap; margin:14px 0 24px; }
-  .token-box{ width:64px; height:64px; background:#fff; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:10.5px; color:var(--text-3); font-family:'JetBrains Mono',monospace; }
+  .token-box{ width:64px; height:64px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; text-align:center; }
 
   /* ===== TABLE ===== */
   .table-scroll{ overflow-x:auto; margin:14px 0 26px; -webkit-overflow-scrolling:touch; }
   .table-scroll table{ margin:0; min-width:480px; }
   table{ width:100%; border-collapse:collapse; margin:14px 0 26px; font-size:13.5px; }
-  th{ text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--text-3); padding:8px 12px; border-bottom:1px solid var(--border); }
+  th{ text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); padding:8px 12px; border-bottom:1px solid var(--border); }
   td{ padding:12px; border-bottom:1px solid var(--border); color:var(--text-2); vertical-align:top; }
-  tr td:first-child{ color:var(--text); font-weight:600; white-space:nowrap; }
+  tr td:first-child{ color:var(--text); font-weight:700; white-space:nowrap; }
   @media (max-width:640px){ th,td{ padding:9px 10px; font-size:12.5px; } }
 
-  /* ===== MOBILE PREVIEW (phone frames) ===== */
-  .preview-row{ display:flex; gap:22px; flex-wrap:wrap; margin:18px 0 8px; }
-  .phone{
-    width:230px; border-radius:26px; background:#0B0D17; padding:10px; box-shadow:var(--sh-lg); flex-shrink:0;
-  }
-  .phone-notch{ width:70px; height:16px; background:#0B0D17; border-radius:0 0 10px 10px; margin:0 auto 6px; position:relative; }
-  .phone-screen{ background:#fff; border-radius:16px; overflow:hidden; height:400px; display:flex; flex-direction:column; }
-  .phone-caption{ text-align:center; font-size:12px; color:var(--text-3); margin-top:10px; font-family:'JetBrains Mono',monospace; }
-
-  .pv-topbar{ height:38px; display:flex; align-items:center; justify-content:space-between; padding:0 10px; border-bottom:1px solid var(--border); flex-shrink:0; }
-  .pv-ham{ width:22px; height:22px; border-radius:5px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; }
-  .pv-title{ font-size:10.5px; font-weight:600; }
-  .pv-dot{ width:16px; height:16px; border-radius:4px; background:var(--text); display:flex; align-items:center; justify-content:center; }
-
-  .pv-body{ flex:1; padding:14px 12px; overflow:hidden; position:relative; }
-  .pv-eyebrow{ font-size:8.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ai-b); margin-bottom:6px; }
-  .pv-h1{ font-size:17px; font-weight:800; line-height:1.15; margin-bottom:6px; }
-  .pv-sub{ font-size:9.5px; color:var(--text-2); line-height:1.5; margin-bottom:10px; }
-  .pv-callout{ background:var(--spark-bg); border:1px solid #F0DBA0; border-radius:6px; padding:8px 9px; font-size:8.5px; color:#6B4E00; margin-bottom:10px; line-height:1.5; }
-  .pv-card{ border:1px solid var(--border); border-radius:8px; padding:8px; margin-bottom:8px; }
-  .pv-card-title{ font-size:10px; font-weight:600; margin-bottom:2px; }
-  .pv-card-desc{ font-size:8.5px; color:var(--text-2); }
-  .pv-grid{ display:grid; grid-template-columns:1fr; gap:6px; }
-
-  /* drawer-open illustration */
-  .pv-drawer{ position:absolute; top:0; left:0; bottom:0; width:78%; background:var(--surface); border-right:1px solid var(--border); padding:12px 10px; z-index:2; }
-  .pv-drawer-item{ font-size:9px; padding:6px 8px; border-radius:5px; color:var(--text-2); margin-bottom:2px; }
-  .pv-drawer-item.active{ background:#EAEAE8; color:var(--text); font-weight:600; }
-  .pv-drawer-label{ font-size:7.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-3); font-weight:700; margin:10px 0 4px; }
-  .pv-backdrop{ position:absolute; inset:0; background:rgba(11,13,23,.35); z-index:1; }
-
-  /* ===== TREE (sitemap) ===== */
-  .tree{ font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:18px 20px; line-height:2; color:var(--text-2); }
+  /* ===== TREE ===== */
+  .tree{ font-family:'JetBrains Mono',monospace; font-size:13px; background:#FFF7E4; border:1px solid var(--border); border-radius:var(--r-lg); padding:18px 20px; line-height:2; color:var(--text-2); }
   .tree b{ color:var(--text); }
   .tree .l1{ padding-left:0; } .tree .l2{ padding-left:20px; } .tree .l3{ padding-left:40px; }
 
@@ -242,19 +220,49 @@
   .split-panel{ border-radius:var(--r-lg); overflow:hidden; border:1px solid var(--border); }
   .split-head{ padding:14px 16px; font-weight:700; font-size:13.5px; }
   .split-body{ padding:16px; font-size:13px; line-height:1.6; }
-  .kid-panel .split-head{ background:linear-gradient(135deg,#0B0D17,#16193B); color:#fff; }
-  .kid-panel .split-body{ background:#fff; color:var(--text-2); }
-  .kid-dot{ width:8px; height:8px; border-radius:50%; background:#FFB800; display:inline-block; margin-right:6px; }
-  .parent-panel .split-head{ background:var(--surface); color:var(--text); border-bottom:1px solid var(--border); }
-  .parent-panel .split-body{ background:#fff; color:var(--text-2); }
-  .parent-dot{ width:8px; height:8px; border-radius:50%; background:var(--ai-b); display:inline-block; margin-right:6px; }
+  .kid-panel .split-head{ background:linear-gradient(135deg,var(--primary),var(--friendly)); color:#fff; }
+  .kid-panel .split-body{ background:var(--surface); color:var(--text-2); }
+  .kid-dot{ width:8px; height:8px; border-radius:50%; background:#fff; display:inline-block; margin-right:6px; }
+  .parent-panel .split-head{ background:#FFF7E4; color:var(--text); border-bottom:1px solid var(--border); }
+  .parent-panel .split-body{ background:var(--surface); color:var(--text-2); }
+  .parent-dot{ width:8px; height:8px; border-radius:50%; background:var(--secondary); display:inline-block; margin-right:6px; }
 
-  .final-spec{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:24px; }
+  .final-spec{ background:#FFF7E4; border:1px solid var(--border); border-radius:var(--r-lg); padding:24px; }
   @media (max-width:480px){ .final-spec{ padding:16px; } }
   .fs-row{ display:grid; grid-template-columns:160px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:13.5px; }
   @media (max-width:480px){ .fs-row{ grid-template-columns:1fr; gap:4px; } }
   .fs-row:last-child{ border-bottom:none; }
-  .fs-key{ font-weight:600; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--ai-b); }
+  .fs-key{ font-weight:700; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--secondary); }
+
+  /* ===== MOBILE PREVIEW (phone frames) ===== */
+  .preview-row{ display:flex; gap:22px; flex-wrap:wrap; margin:18px 0 8px; }
+  @media (max-width:520px){ .preview-row{ gap:16px; justify-content:center; } }
+  .phone{ width:230px; border-radius:26px; background:#263238; padding:10px; box-shadow:var(--sh-lg); flex-shrink:0; }
+  @media (max-width:400px){ .phone{ width:170px; padding:8px; border-radius:20px; } .phone-screen{ height:300px !important; } }
+  .phone-notch{ width:70px; height:16px; background:#263238; border-radius:0 0 10px 10px; margin:0 auto 6px; position:relative; }
+  .phone-screen{ background:var(--background); border-radius:16px; overflow:hidden; height:400px; display:flex; flex-direction:column; }
+  .phone-caption{ text-align:center; font-size:12px; color:var(--muted); margin-top:10px; font-family:'JetBrains Mono',monospace; }
+
+  .pv-topbar{ height:38px; display:flex; align-items:center; justify-content:space-between; padding:0 10px; border-bottom:1px solid var(--border); flex-shrink:0; background:var(--surface); }
+  .pv-ham{ width:22px; height:22px; border-radius:6px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; }
+  .pv-title{ font-size:10.5px; font-weight:700; font-family:'Fredoka'; }
+  .pv-dot{ width:16px; height:16px; border-radius:5px; background:var(--primary); display:flex; align-items:center; justify-content:center; }
+
+  .pv-body{ flex:1; padding:14px 12px; overflow:hidden; position:relative; }
+  .pv-eyebrow{ font-size:8.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--secondary); margin-bottom:6px; }
+  .pv-h1{ font-family:'Fredoka'; font-size:16px; font-weight:600; line-height:1.15; margin-bottom:6px; }
+  .pv-sub{ font-size:9.5px; color:var(--text-2); line-height:1.5; margin-bottom:10px; }
+  .pv-callout{ background:rgba(255,217,61,.3); border:1px solid #F0D26A; border-radius:6px; padding:8px 9px; font-size:8.5px; color:#6B4E00; margin-bottom:10px; line-height:1.5; }
+  .pv-card{ border:1px solid var(--border); background:var(--surface); border-radius:10px; padding:8px; margin-bottom:8px; }
+  .pv-card-title{ font-size:10px; font-weight:700; margin-bottom:2px; }
+  .pv-card-desc{ font-size:8.5px; color:var(--text-2); }
+  .pv-grid{ display:grid; grid-template-columns:1fr; gap:6px; }
+
+  .pv-drawer{ position:absolute; top:0; left:0; bottom:0; width:78%; background:var(--surface); border-right:1px solid var(--border); padding:12px 10px; z-index:2; }
+  .pv-drawer-item{ font-size:9px; padding:6px 8px; border-radius:6px; color:var(--text-2); margin-bottom:2px; }
+  .pv-drawer-item.active{ background:rgba(255,138,61,.16); color:var(--primary); font-weight:700; }
+  .pv-drawer-label{ font-size:7.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; margin:10px 0 4px; }
+  .pv-backdrop{ position:absolute; inset:0; background:rgba(38,50,56,.4); z-index:1; }
 </style>
 </head>
 <body>
@@ -266,7 +274,7 @@
   <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <span class="brand-mark"><svg width="12" height="12" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2L14 9L21 11L14 13L12 20L10 13L3 11L10 9L12 2Z"/></svg></span>
+      <span class="brand-mark"><svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L14 9L21 11L14 13L12 20L10 13L3 11L10 9L12 2Z"/></svg></span>
       <span class="brand-name">kidSpark</span>
       <span class="brand-sub">/ Design Docs</span>
     </div>
@@ -307,27 +315,27 @@
     <div class="nav-group">
       <div class="nav-label">Summary</div>
       <div class="nav-item" data-target="s19"><span class="nav-num">19</span>Final Spec</div>
-      <div class="nav-item" data-target="s20"><span class="nav-num">20</span>kidSpark Adaptation</div>
+      <div class="nav-item" data-target="s20"><span class="nav-num">20</span>Two Contexts, One System</div>
     </div>
   </aside>
 
   <!-- ============ MAIN ============ -->
   <div class="main">
     <div class="topbar">
-      <div class="hamburger" id="hamburgerBtn" aria-label="Open navigation">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </div>
-      <div class="crumb">kidSpark <span>/</span> Design System <span>/</span> <b>Notion AI Analysis</b></div>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#263238" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="crumb">kidSpark <span>/</span> <b>Design System</b></div>
       <div class="pill">Internal reference</div>
     </div>
 
     <div class="content">
-      <div class="sec-eyebrow">Design system reverse-engineering</div>
-      <h1 class="doc-title">Notion AI — analyzed for kidSpark</h1>
-      <p class="doc-sub">A full breakdown of Notion AI's design decisions, translated into reusable tokens and adapted into working principles for kidSpark's parent dashboard.</p>
+      <div class="sec-eyebrow">Design system</div>
+      <h1 class="doc-title">kidSpark — Design System</h1>
+      <p class="doc-sub">The visual language, tokens, components, and interaction patterns that define kidSpark — from the marketing site to the parent dashboard.</p>
 
       <div class="callout">
-        ✦ <div><b>Framing note:</b> Notion AI's palette is neutral because its audience is adults doing focused work. kidSpark's marketing site and kid-facing app stay warm and playful — this analysis is adapted specifically for the <b>parent dashboard</b>, the one surface in kidSpark where a calm, restrained UI is the right choice.</div>
+        ✦ <div><b>How to read this:</b> kidSpark runs on one bright, friendly palette used consistently everywhere — what changes between the kid-facing app and the parent dashboard is density and tone, not color. Kids get bold, full-color adventures; parents get the same palette used more quietly on a calm, scannable dashboard. See section 20 for how that split works in practice.</div>
       </div>
 
       <!-- MOBILE PREVIEW -->
@@ -342,18 +350,18 @@
               <div class="phone-notch"></div>
               <div class="phone-screen">
                 <div class="pv-topbar">
-                  <div class="pv-ham"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
-                  <div class="pv-title">Notion AI Analysis</div>
+                  <div class="pv-ham"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#263238" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
+                  <div class="pv-title">kidSpark Design System</div>
                   <div class="pv-dot"></div>
                 </div>
                 <div class="pv-body">
                   <div class="pv-eyebrow">Design system</div>
-                  <div class="pv-h1">Notion AI — analyzed for kidSpark</div>
-                  <div class="pv-sub">A full breakdown of Notion AI's design decisions, adapted for kidSpark.</div>
-                  <div class="pv-callout">✦ Framing note: adapted specifically for the parent dashboard.</div>
+                  <div class="pv-h1">kidSpark — Design System</div>
+                  <div class="pv-sub">The visual language and components that define kidSpark.</div>
+                  <div class="pv-callout">✦ One bright palette, used quietly on the parent dashboard and boldly in kid mode.</div>
                   <div class="pv-grid">
-                    <div class="pv-card"><div class="pv-card-title">Personality</div><div class="pv-card-desc">Quiet, precise, unhurried</div></div>
-                    <div class="pv-card"><div class="pv-card-title">Density</div><div class="pv-card-desc">Low by default, expandable</div></div>
+                    <div class="pv-card"><div class="pv-card-title">Personality</div><div class="pv-card-desc">Warm, encouraging, a little mischievous</div></div>
+                    <div class="pv-card"><div class="pv-card-title">Density</div><div class="pv-card-desc">Low — one big idea per screen</div></div>
                   </div>
                 </div>
               </div>
@@ -366,8 +374,8 @@
               <div class="phone-notch"></div>
               <div class="phone-screen" style="position:relative;">
                 <div class="pv-topbar">
-                  <div class="pv-ham"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
-                  <div class="pv-title">Notion AI Analysis</div>
+                  <div class="pv-ham"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#263238" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
+                  <div class="pv-title">kidSpark Design System</div>
                   <div class="pv-dot"></div>
                 </div>
                 <div class="pv-body" style="padding:0;">
@@ -395,12 +403,12 @@
       <section class="sec" id="s1">
         <div class="sec-eyebrow">01 — Foundations</div>
         <h2 class="sec-title">Design Philosophy</h2>
-        <p class="sec-body">Notion AI's core idea is the <b>invisible interface</b> — the tool disappears so nothing competes with the content. Target users are knowledge workers doing focused cognitive work. The visual tone is monochrome-first: color is spent only on meaning, never decoration.</p>
+        <p class="sec-body">kidSpark's philosophy is <b>playful clarity</b>: warm and energetic enough that a five-year-old wants to open it, organized enough that nothing gets in the way of finishing a lesson. Target users are kids ages 5–10 and the parents managing their accounts. The visual tone is bright and rounded — but never chaotic. Every screen has exactly one clear next step.</p>
         <div class="grid grid-4">
-          <div class="card"><div class="card-title">Personality</div><div class="card-desc">Quiet, precise, unhurried</div></div>
-          <div class="card"><div class="card-title">Density</div><div class="card-desc">Low by default, expandable on demand</div></div>
-          <div class="card"><div class="card-title">Character</div><div class="card-desc">Minimalist shell, maximalist depth</div></div>
-          <div class="card"><div class="card-title">Reusable rule</div><div class="card-desc">Hide power behind restraint</div></div>
+          <div class="card"><div class="card-title">Personality</div><div class="card-desc">Warm, encouraging, a little mischievous</div></div>
+          <div class="card"><div class="card-title">Density</div><div class="card-desc">Low — one big idea per screen</div></div>
+          <div class="card"><div class="card-title">Character</div><div class="card-desc">Candy-bright palette, generous whitespace</div></div>
+          <div class="card"><div class="card-title">Reusable rule</div><div class="card-desc">One primary color per screen, one clear action</div></div>
         </div>
       </section>
 
@@ -408,14 +416,14 @@
       <section class="sec" id="s2">
         <div class="sec-eyebrow">02 — Layout &amp; structure</div>
         <h2 class="sec-title">Page Layout</h2>
-        <p class="sec-body">Fixed sidebar, single scrolling main column, no permanent right panel. Content is centered with a max-width — never edge-to-edge.</p>
+        <p class="sec-body">A fixed sidebar for the parent dashboard, single scrolling main column, big centered content on kid-facing screens. Content is never edge-to-edge — generous margins keep focus on one activity at a time.</p>
         <div class="wireframe">
-          <div class="wf-top">TOP BAR — breadcrumb · share · icons (48px)</div>
+          <div class="wf-top">TOP BAR — breadcrumb · profile · icons (48px)</div>
           <div class="wf-body">
             <div class="wf-side">
-              <div>▸ Home</div><div>▸ Search</div><div style="color:var(--text-2); font-weight:600;">▸ Private</div>
-              <div>&nbsp;&nbsp;— Page A</div><div>&nbsp;&nbsp;— Page B</div><div>▸ Shared</div>
-              <div style="margin-top:12px; color:var(--text-3);">SIDEBAR<br>240–280px</div>
+              <div>▸ Dashboard</div><div style="color:var(--primary); font-weight:700;">▸ Children</div>
+              <div>&nbsp;&nbsp;— Child A</div><div>&nbsp;&nbsp;— Child B</div><div>▸ Reports</div>
+              <div style="margin-top:12px; color:var(--muted);">SIDEBAR<br>240–280px</div>
             </div>
             <div class="wf-main">
               <div class="wf-main-box title"></div>
@@ -431,14 +439,14 @@
       <section class="sec" id="s3">
         <div class="sec-eyebrow">03 — Foundations</div>
         <h2 class="sec-title">Visual Hierarchy</h2>
-        <p class="sec-body">Built almost entirely through <b>size and weight</b>, not color — so when color does appear, it reads instantly as meaningful.</p>
+        <p class="sec-body">Built with <b>size, color, and motion together</b> — kidSpark can afford to let color carry more weight than a neutral product would, as long as each screen commits to one dominant color rather than mixing several.</p>
         <div class="table-scroll"><table>
           <tr><th>Order</th><th>Element</th><th>Mechanism</th></tr>
-          <tr><td>1st</td><td>Page title</td><td>Largest text, bold, dark</td></tr>
-          <tr><td>2nd</td><td>Active content</td><td>Normal weight + cursor position</td></tr>
-          <tr><td>3rd</td><td>Inline AI suggestion</td><td>Subtle tinted block, not shouted color</td></tr>
-          <tr><td>4th</td><td>Sidebar selection</td><td>Light gray fill, no border/shadow</td></tr>
-          <tr><td>5th</td><td>Metadata / icons</td><td>Small, low-contrast gray</td></tr>
+          <tr><td>1st</td><td>Screen / lesson title</td><td>Large, bold, Fredoka display type</td></tr>
+          <tr><td>2nd</td><td>Primary action (Start / Continue)</td><td>Big orange button, high contrast</td></tr>
+          <tr><td>3rd</td><td>Positive feedback ("Great job!")</td><td>Green highlight, appears only on success</td></tr>
+          <tr><td>4th</td><td>Navigation / sidebar selection</td><td>Soft orange tint fill</td></tr>
+          <tr><td>5th</td><td>Metadata (progress, time)</td><td>Small muted text</td></tr>
         </table></div>
       </section>
 
@@ -446,7 +454,7 @@
       <section class="sec" id="s4">
         <div class="sec-eyebrow">04 — Foundations</div>
         <h2 class="sec-title">Spacing System</h2>
-        <p class="sec-body">A 4px base unit scaling through a classic 4/8 rhythm.</p>
+        <p class="sec-body">A 4px base unit, scaled generously — kidSpark leans toward the larger end of each step, since touch targets and readability matter more than density.</p>
         <div>
           <div class="space-row"><div class="space-label">xs</div><div class="space-bar" style="width:4px;"></div><div class="space-px">4px</div></div>
           <div class="space-row"><div class="space-label">sm</div><div class="space-bar" style="width:8px;"></div><div class="space-px">8px</div></div>
@@ -462,13 +470,13 @@
       <section class="sec" id="s5">
         <div class="sec-eyebrow">05 — Foundations</div>
         <h2 class="sec-title">Typography Scale</h2>
-        <p class="sec-body">Inter throughout. Fewer scale steps than most systems — weight carries more hierarchy than size.</p>
+        <p class="sec-body"><b>Fredoka</b> for headings — rounded, friendly, never used for body text. <b>Inter</b> for everything a kid or parent actually reads, since legibility matters more than personality at small sizes.</p>
         <div>
-          <div class="type-row"><div style="font-weight:700; font-size:36px;">Page title</div><div class="type-meta">h1 · 36px / 700 / 1.2</div></div>
-          <div class="type-row"><div style="font-weight:600; font-size:24px;">Section heading</div><div class="type-meta">h2 · 24px / 600 / 1.3</div></div>
-          <div class="type-row"><div style="font-weight:600; font-size:19px;">Subheading</div><div class="type-meta">h3 · 19px / 600 / 1.4</div></div>
-          <div class="type-row"><div style="font-weight:400; font-size:15px;">Body text reads at fifteen to sixteen pixels</div><div class="type-meta">body · 15px / 400 / 1.6</div></div>
-          <div class="type-row"><div style="font-weight:500; font-size:12px; color:var(--text-3);">Caption / metadata label</div><div class="type-meta">caption · 12px / 500 / 1.4</div></div>
+          <div class="type-row"><div class="disp" style="font-weight:600; font-size:36px;">Adventure title</div><div class="type-meta">h1 · 36px / Fredoka 600 / 1.2</div></div>
+          <div class="type-row"><div class="disp" style="font-weight:600; font-size:24px;">Section heading</div><div class="type-meta">h2 · 24px / Fredoka 600 / 1.3</div></div>
+          <div class="type-row"><div class="disp" style="font-weight:600; font-size:19px;">Subheading</div><div class="type-meta">h3 · 19px / Fredoka 600 / 1.4</div></div>
+          <div class="type-row"><div style="font-weight:400; font-size:15px;">Body text reads at fifteen to sixteen pixels</div><div class="type-meta">body · 15px / Inter 400 / 1.6</div></div>
+          <div class="type-row"><div style="font-weight:500; font-size:12px; color:var(--muted);">Caption / metadata label</div><div class="type-meta">caption · 12px / Inter 500 / 1.4</div></div>
         </div>
       </section>
 
@@ -476,16 +484,16 @@
       <section class="sec" id="s6">
         <div class="sec-eyebrow">06 — Foundations</div>
         <h2 class="sec-title">Color System</h2>
-        <p class="sec-body">Color as a <b>signal channel</b>. The primary action color isn't even a brand color — it's ink. Only the AI accent stays consistently saturated.</p>
+        <p class="sec-body">A warm, high-energy palette built for kids — but each color is still assigned a specific job, so brightness never turns into visual noise.</p>
         <div class="grid grid-4">
-          <div class="swatch"><div class="swatch-fill" style="background:#FFFFFF; border-bottom:1px solid var(--border);"></div><div class="swatch-meta"><div class="swatch-name">Background</div><div class="swatch-hex">#FFFFFF</div></div></div>
-          <div class="swatch"><div class="swatch-fill" style="background:#F7F7F5;"></div><div class="swatch-meta"><div class="swatch-name">Surface</div><div class="swatch-hex">#F7F7F5</div></div></div>
-          <div class="swatch"><div class="swatch-fill" style="background:#191919;"></div><div class="swatch-meta"><div class="swatch-name">Text primary</div><div class="swatch-hex">#191919</div></div></div>
-          <div class="swatch"><div class="swatch-fill" style="background:#5F5E5B;"></div><div class="swatch-meta"><div class="swatch-name">Text secondary</div><div class="swatch-hex">#5F5E5B</div></div></div>
-          <div class="swatch"><div class="swatch-fill" style="background:#9B9A97;"></div><div class="swatch-meta"><div class="swatch-name">Text muted</div><div class="swatch-hex">#9B9A97</div></div></div>
-          <div class="swatch"><div class="swatch-fill" style="background:#EDECEA;"></div><div class="swatch-meta"><div class="swatch-name">Border</div><div class="swatch-hex">#EDECEA</div></div></div>
-          <div class="swatch"><div class="swatch-fill" style="background:linear-gradient(135deg,#9A6DFF,#6366F1);"></div><div class="swatch-meta"><div class="swatch-name">AI accent</div><div class="swatch-hex">#9A6DFF → #6366F1</div></div></div>
-          <div class="swatch"><div class="swatch-fill" style="background:#2F9E44;"></div><div class="swatch-meta"><div class="swatch-name">Success</div><div class="swatch-hex">#2F9E44</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#FF8A3D;"></div><div class="swatch-meta"><div class="swatch-name">Primary</div><div class="swatch-role">Main actions, brand</div><div class="swatch-hex">#FF8A3D</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#FFD93D;"></div><div class="swatch-meta"><div class="swatch-name">Accent</div><div class="swatch-role">Fun / energy, highlights</div><div class="swatch-hex">#FFD93D</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#4D96FF;"></div><div class="swatch-meta"><div class="swatch-name">Secondary</div><div class="swatch-role">Trust / learning</div><div class="swatch-hex">#4D96FF</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#6BCB77;"></div><div class="swatch-meta"><div class="swatch-name">Success</div><div class="swatch-role">Completion, correct answers</div><div class="swatch-hex">#6BCB77</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#9B5DE5;"></div><div class="swatch-meta"><div class="swatch-name">Creativity</div><div class="swatch-role">Art / open-ended activities</div><div class="swatch-hex">#9B5DE5</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#FF6B9A;"></div><div class="swatch-meta"><div class="swatch-name">Friendly accent</div><div class="swatch-role">Characters, mascots</div><div class="swatch-hex">#FF6B9A</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#FFF9E8; border-bottom:1px solid var(--border);"></div><div class="swatch-meta"><div class="swatch-name">Background</div><div class="swatch-role">Page base</div><div class="swatch-hex">#FFF9E8</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#263238;"></div><div class="swatch-meta"><div class="swatch-name">Text</div><div class="swatch-role">Primary reading color</div><div class="swatch-hex">#263238</div></div></div>
         </div>
       </section>
 
@@ -493,14 +501,14 @@
       <section class="sec" id="s7">
         <div class="sec-eyebrow">07–08 — Components</div>
         <h2 class="sec-title">Component States</h2>
-        <p class="sec-body"><b>Button</b> — dark fill, opacity shift on hover, scale dip on active, flat gray when disabled.</p>
+        <p class="sec-body"><b>Button</b> — orange fill, darkens slightly on hover, small scale dip on active, flat cream when disabled.</p>
         <div class="state-row">
           <div class="state-item"><div class="btn btn-default">Continue</div><div class="state-label">default</div></div>
           <div class="state-item"><div class="btn btn-hover">Continue</div><div class="state-label">hover</div></div>
           <div class="state-item"><div class="btn btn-active">Continue</div><div class="state-label">active</div></div>
           <div class="state-item"><div class="btn btn-disabled">Continue</div><div class="state-label">disabled</div></div>
         </div>
-        <p class="sec-body"><b>Sidebar item</b> — transparent → light fill on hover → darker fill + bold when selected.</p>
+        <p class="sec-body"><b>Sidebar item</b> — transparent → light orange tint on hover → stronger tint + orange text when selected.</p>
         <div class="state-row">
           <div class="state-item"><div class="sb-item sb-default">◷ Dashboard</div><div class="state-label">default</div></div>
           <div class="state-item"><div class="sb-item sb-hover">◷ Dashboard</div><div class="state-label">hover</div></div>
@@ -525,35 +533,35 @@
       <section class="sec" id="s10">
         <div class="sec-eyebrow">10 — Components</div>
         <h2 class="sec-title">Interaction Design</h2>
-        <p class="sec-body">Hover fills are near-instant with no movement. AI generation is shown as literal streaming text at the cursor — the content <i>is</i> the progress indicator, no spinner needed. Transitions stay short: 120–180ms, ease-out.</p>
+        <p class="sec-body">Hover and tap states respond immediately with warmth — a soft color pop, never a jarring flash. Success moments (finishing a lesson) get a small celebratory animation, a burst of spark particles, while everyday navigation stays calm so the celebration keeps its meaning. Transitions stay short: 120–200ms, ease-out.</p>
       </section>
 
       <!-- 11 ICONS -->
       <section class="sec" id="s11">
         <div class="sec-eyebrow">11 — Components</div>
         <h2 class="sec-title">Iconography</h2>
-        <p class="sec-body">Line icons, 1.5–2px stroke, rounded joins. Inherit text color rather than carrying their own fixed color.</p>
+        <p class="sec-body">Rounded, friendly line icons, 1.75–2px stroke. Filled where an icon represents a subject or reward, outlined where it's purely navigational — so a parent scanning quickly can tell "this is an action" from "this is decoration."</p>
         <div class="icon-row">
-          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.75"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></div><div class="state-label">16–20px</div></div>
-          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.75"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="state-label">1.75px stroke</div></div>
-          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.75"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><div class="state-label">rounded joins</div></div>
-          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.75"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="state-label">inherits text color</div></div>
+          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#263238" stroke-width="1.75"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/></svg></div><div class="state-label">16–20px</div></div>
+          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8A3D" stroke-width="1.75"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="state-label">colored when active</div></div>
+          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="#FFD93D" stroke="none"><path d="M12 2L14 9L21 11L14 13L12 20L10 13L3 11L10 9L12 2Z"/></svg></div><div class="state-label">filled = reward</div></div>
+          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#263238" stroke-width="1.75"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="state-label">outlined = navigation</div></div>
         </div>
-        <p class="sec-body">Recommended library for implementation: <b>Lucide</b> — closest match to this stroke-based, quiet style.</p>
+        <p class="sec-body">Recommended library for implementation: <b>Lucide</b> — a rounded, stroke-based base set that colors and fills easily to match this style.</p>
       </section>
 
       <!-- 12 BORDER/RADIUS/SHADOW -->
       <section class="sec" id="s12">
         <div class="sec-eyebrow">12 — Components</div>
         <h2 class="sec-title">Borders, Radius, Shadows</h2>
-        <p class="sec-body">Elevation is built with <b>borders first, shadow only for genuinely floating elements</b> — 90% of components rest with no shadow at all.</p>
+        <p class="sec-body">kidSpark uses generously rounded corners and soft, warm-tinted shadows instead of harsh gray ones — elevation should feel like a gentle lift, not a hard edge.</p>
         <div class="token-row">
-          <div class="token-box" style="border-radius:4px;">radius sm</div>
-          <div class="token-box" style="border-radius:8px;">radius md</div>
-          <div class="token-box" style="border-radius:12px;">radius lg</div>
-          <div class="token-box" style="border-radius:8px; box-shadow:var(--sh-sm); border:none;">shadow sm</div>
-          <div class="token-box" style="border-radius:8px; box-shadow:var(--sh-md); border:none;">shadow md</div>
-          <div class="token-box" style="border-radius:8px; box-shadow:var(--sh-lg); border:none;">shadow lg</div>
+          <div class="token-box" style="border-radius:8px;">radius sm<br>8px</div>
+          <div class="token-box" style="border-radius:12px;">radius md<br>12px</div>
+          <div class="token-box" style="border-radius:20px;">radius lg<br>20px</div>
+          <div class="token-box" style="border-radius:12px; box-shadow:var(--sh-sm); border:none;">shadow sm</div>
+          <div class="token-box" style="border-radius:12px; box-shadow:var(--sh-md); border:none;">shadow md</div>
+          <div class="token-box" style="border-radius:12px; box-shadow:var(--sh-lg); border:none;">shadow lg</div>
         </div>
       </section>
 
@@ -570,14 +578,16 @@
           </div>
           <div class="editor-body"><pre><code><span class="c-sel">:root</span> {
   <span class="c-comment">/* Color */</span>
-  <span class="c-prop">--color-bg</span>: <span class="c-val">#FFFFFF</span>;
-  <span class="c-prop">--color-surface</span>: <span class="c-val">#F7F7F5</span>;
-  <span class="c-prop">--color-text-primary</span>: <span class="c-val">#191919</span>;
-  <span class="c-prop">--color-text-secondary</span>: <span class="c-val">#5F5E5B</span>;
-  <span class="c-prop">--color-border</span>: <span class="c-val">#EDECEA</span>;
-  <span class="c-prop">--color-action-primary</span>: <span class="c-val">#191919</span>;
-  <span class="c-prop">--color-ai-accent-start</span>: <span class="c-val">#9A6DFF</span>;
-  <span class="c-prop">--color-ai-accent-end</span>: <span class="c-val">#6366F1</span>;
+  <span class="c-prop">--primary</span>: <span class="c-val">#FF8A3D</span>;
+  <span class="c-prop">--secondary</span>: <span class="c-val">#4D96FF</span>;
+  <span class="c-prop">--accent</span>: <span class="c-val">#FFD93D</span>;
+  <span class="c-prop">--success</span>: <span class="c-val">#6BCB77</span>;
+  <span class="c-prop">--creativity</span>: <span class="c-val">#9B5DE5</span>;
+  <span class="c-prop">--friendly</span>: <span class="c-val">#FF6B9A</span>;
+  <span class="c-prop">--background</span>: <span class="c-val">#FFF9E8</span>;
+  <span class="c-prop">--surface</span>: <span class="c-val">#FFFFFF</span>;
+  <span class="c-prop">--text</span>: <span class="c-val">#263238</span>;
+  <span class="c-prop">--muted</span>: <span class="c-val">#6B7280</span>;
 
   <span class="c-comment">/* Spacing */</span>
   <span class="c-prop">--space-xs</span>: <span class="c-val">4px</span>;
@@ -585,16 +595,16 @@
   <span class="c-prop">--space-md</span>: <span class="c-val">12px</span>;
   <span class="c-prop">--space-lg</span>: <span class="c-val">16px</span>;
   <span class="c-prop">--space-xl</span>: <span class="c-val">24px</span>;
-  <span class="c-prop">--space-2xl</span>: <span class="c-val">32px</span>;
 
   <span class="c-comment">/* Typography */</span>
-  <span class="c-prop">--font-family</span>: <span class="c-key">'Inter'</span>, system-ui, sans-serif;
-  <span class="c-prop">--text-h1</span>: <span class="c-val">700 36px/1.2</span> var(--font-family);
-  <span class="c-prop">--text-body</span>: <span class="c-val">400 15px/1.6</span> var(--font-family);
+  <span class="c-prop">--font-display</span>: <span class="c-key">'Fredoka'</span>, sans-serif;
+  <span class="c-prop">--font-body</span>: <span class="c-key">'Inter'</span>, system-ui, sans-serif;
+  <span class="c-prop">--text-h1</span>: <span class="c-val">600 36px/1.2</span> var(--font-display);
+  <span class="c-prop">--text-body</span>: <span class="c-val">400 15px/1.6</span> var(--font-body);
 
   <span class="c-comment">/* Radius + shadow */</span>
-  <span class="c-prop">--radius-md</span>: <span class="c-val">8px</span>;
-  <span class="c-prop">--shadow-md</span>: <span class="c-val">0 4px 12px rgba(0,0,0,0.08)</span>;
+  <span class="c-prop">--radius-lg</span>: <span class="c-val">20px</span>;
+  <span class="c-prop">--shadow-md</span>: <span class="c-val">0 6px 18px rgba(255,138,61,0.16)</span>;
 }</code></pre></div>
         </div>
       </section>
@@ -604,11 +614,11 @@
         <div class="sec-eyebrow">14 — System</div>
         <h2 class="sec-title">Design Patterns</h2>
         <div class="table-scroll"><table>
-          <tr><th>Pattern</th><th>kidSpark usage</th></tr>
+          <tr><th>Pattern</th><th>Where it's used in kidSpark</th></tr>
+          <tr><td>Sky-map navigation</td><td>Kid home screen — subjects as constellations to explore</td></tr>
+          <tr><td>Spark reward burst</td><td>Plays every time a kid finishes an activity</td></tr>
           <tr><td>Sidebar nav</td><td>Parent dashboard — children, subjects, settings</td></tr>
-          <tr><td>Inline "/" trigger</td><td>"Ask kidSpark" weekly-summary helper for parents</td></tr>
-          <tr><td>Slide-in panel</td><td>Lesson detail opening without leaving context</td></tr>
-          <tr><td>Streaming text</td><td>AI parent-report generation, inline not modal</td></tr>
+          <tr><td>Streak calendar</td><td>Weekly parent summary</td></tr>
           <tr><td>Empty state</td><td>"No activity yet this week" dashboard state</td></tr>
         </table></div>
       </section>
@@ -617,10 +627,10 @@
       <section class="sec" id="s15">
         <div class="sec-eyebrow">15 — Layout &amp; structure</div>
         <h2 class="sec-title">Information Architecture</h2>
-        <p class="sec-body">Sidebar mirrors the content hierarchy exactly — one mental model for the whole product.</p>
+        <p class="sec-body">Sidebar mirrors the content hierarchy exactly — one mental model for the whole dashboard.</p>
         <div class="tree">
           <div class="l1"><b>kidSpark</b> (app)</div>
-          <div class="l2">├── Dashboard <span style="color:var(--text-3);">(default landing)</span></div>
+          <div class="l2">├── Dashboard <span style="color:var(--muted);">(default landing)</span></div>
           <div class="l2">├── Children</div>
           <div class="l3">│　　├── Child A → progress, streaks, sparks</div>
           <div class="l3">│　　└── Child B → …</div>
@@ -638,9 +648,9 @@
         <div class="sec-eyebrow">16 — System</div>
         <h2 class="sec-title">Accessibility</h2>
         <div class="grid grid-2">
-          <div class="card"><div class="card-title">Contrast</div><div class="card-desc">Primary text comfortably exceeds WCAG AA; double-check muted-gray combinations</div></div>
-          <div class="card"><div class="card-title">Focus states</div><div class="card-desc">2px outline ring, offset from the element's own border</div></div>
-          <div class="card"><div class="card-title">Touch targets</div><div class="card-desc">44px minimum on kidSpark's mobile parent views (consumer app, not desktop-first)</div></div>
+          <div class="card"><div class="card-title">Contrast</div><div class="card-desc">Dark slate text on cream/white comfortably clears WCAG AA</div></div>
+          <div class="card"><div class="card-title">Focus states</div><div class="card-desc">2px blue outline ring, offset from the element's own border</div></div>
+          <div class="card"><div class="card-title">Touch targets</div><div class="card-desc">44px minimum on parent-facing screens; 56px+ for anything a child taps directly</div></div>
           <div class="card"><div class="card-title">Screen readers</div><div class="card-desc">Icon-only buttons need explicit aria-labels</div></div>
         </div>
       </section>
@@ -649,7 +659,7 @@
       <section class="sec" id="s17">
         <div class="sec-eyebrow">17 — System</div>
         <h2 class="sec-title">Implementation Guidance</h2>
-        <p class="sec-body">Map the token table into <span class="mono" style="background:var(--surface); padding:2px 6px; border-radius:4px;">tailwind.config.js</span> so every component pulls from one source of truth. CSS Grid for the outer shell, Flexbox within components — mobile-first breakpoints, sidebar as a drawer under 768px.</p>
+        <p class="sec-body">Map the token table into <span class="mono" style="background:#FFF7E4; padding:2px 6px; border-radius:4px;">tailwind.config.js</span> so every component pulls from one source of truth. CSS Grid for the outer shell, Flexbox within components — mobile-first breakpoints, sidebar as a drawer under 768px.</p>
       </section>
 
       <!-- 18 STRUCTURE/STYLE/BEHAVIOR -->
@@ -657,9 +667,9 @@
         <div class="sec-eyebrow">18 — System</div>
         <h2 class="sec-title">Structure / Style / Behavior</h2>
         <div class="grid grid-3">
-          <div class="card"><div class="card-title">Structure</div><div class="card-desc">Sidebar + centered main column, top bar, no persistent right panel</div></div>
-          <div class="card"><div class="card-title">Style</div><div class="card-desc">Near-monochrome, border-based separation, one reserved accent color</div></div>
-          <div class="card"><div class="card-title">Behavior</div><div class="card-desc">Hover-revealed affordances, streaming over spinners, minimal transitions</div></div>
+          <div class="card"><div class="card-title">Structure</div><div class="card-desc">Sidebar + centered column for parents; single full-bleed activity view for kids</div></div>
+          <div class="card"><div class="card-title">Style</div><div class="card-desc">Bright, rounded, one dominant color per screen</div></div>
+          <div class="card"><div class="card-title">Behavior</div><div class="card-desc">Immediate warm feedback, celebration reserved for real achievements</div></div>
         </div>
       </section>
 
@@ -668,39 +678,38 @@
         <div class="sec-eyebrow">19 — Summary</div>
         <h2 class="sec-title">Final Design Specification</h2>
         <div class="final-spec">
-          <div class="fs-row"><div class="fs-key">philosophy</div><div>Invisible interface — hide power behind restraint</div></div>
+          <div class="fs-row"><div class="fs-key">philosophy</div><div>Playful clarity — bright and warm, but always one clear next step</div></div>
           <div class="fs-row"><div class="fs-key">layout</div><div>Fixed sidebar (240–280px) + centered main column (~900px max)</div></div>
           <div class="fs-row"><div class="fs-key">spacing_scale</div><div>4 · 8 · 12 · 16 · 24 · 32 · 48</div></div>
-          <div class="fs-row"><div class="fs-key">type_scale</div><div>h1 36/700 · h2 24/600 · h3 19/600 · body 15/400 · caption 12/500</div></div>
-          <div class="fs-row"><div class="fs-key">border_system</div><div>1px #EDECEA — primary separator, shadow reserved for floating elements</div></div>
-          <div class="fs-row"><div class="fs-key">interaction</div><div>Hover reveals, no confirm on reversible actions, streaming &gt; spinners</div></div>
+          <div class="fs-row"><div class="fs-key">type_scale</div><div>h1 36/600 Fredoka · body 15/400 Inter</div></div>
+          <div class="fs-row"><div class="fs-key">color</div><div>Primary #FF8A3D · Secondary #4D96FF · Accent #FFD93D · Success #6BCB77</div></div>
+          <div class="fs-row"><div class="fs-key">interaction</div><div>Warm hover states, spark-burst celebration on real achievements only</div></div>
         </div>
       </section>
 
-      <!-- 20 ADAPTATION -->
+      <!-- 20 TWO CONTEXTS -->
       <section class="sec" id="s20">
         <div class="sec-eyebrow">20 — Summary</div>
-        <h2 class="sec-title">Adapted for kidSpark</h2>
-        <p class="sec-body">kidSpark runs <b>two design languages under one brand</b> — not a clone of Notion's neutral skin everywhere.</p>
+        <h2 class="sec-title">Two Contexts, One System</h2>
+        <p class="sec-body">kidSpark uses <b>one palette everywhere</b> — what changes between kid mode and the parent dashboard is density and volume, not color.</p>
 
         <div class="split">
           <div class="split-panel kid-panel">
-            <div class="split-head"><span class="kid-dot"></span>Marketing site &amp; kid app</div>
-            <div class="split-body">Warm, playful, spark-themed. Fredoka display type, gold accent, night-sky visual language. Delight-driven.</div>
+            <div class="split-head"><span class="kid-dot"></span>Kid mode</div>
+            <div class="split-body">Full-bleed color per subject, big glowing rewards, minimal text, audio-first. The palette at maximum volume.</div>
           </div>
           <div class="split-panel parent-panel">
             <div class="split-head"><span class="parent-dot"></span>Parent dashboard</div>
-            <div class="split-body">Calm, restrained, Notion-inspired. Inter throughout, borders over shadows, one accent reserved for meaning. Get in, see status, leave.</div>
+            <div class="split-body">Same palette, quieter application — white cards on a cream background, one accent used sparingly, more text density for quick scanning.</div>
           </div>
         </div>
 
         <div class="table-scroll"><table>
-          <tr><th>Notion AI principle</th><th>kidSpark adaptation</th></tr>
-          <tr><td>Hide power behind restraint</td><td>Dashboard default view stays sparse; detail lives one click deeper</td></tr>
-          <tr><td>Shadow reserved for floating elements</td><td>Kept literally — consistent with how spark-glow is already used meaningfully</td></tr>
-          <tr><td>One accent reserved for meaning</td><td>Spark-gold stays the only "achievement" signal — never decorative</td></tr>
-          <tr><td>Inline AI trigger, not a chat bubble</td><td>Weekly summary streams into the dashboard card itself</td></tr>
-          <tr><td>Sidebar mirrors IA exactly</td><td>Dashboard → Children → Library → Reports → Settings</td></tr>
+          <tr><th>Principle</th><th>How it shows up</th></tr>
+          <tr><td>Color volume</td><td>Kid mode: full-color backgrounds per subject. Parent dashboard: one accent on white cards</td></tr>
+          <tr><td>Celebration</td><td>Kid mode: spark burst + sound. Parent dashboard: a small green checkmark</td></tr>
+          <tr><td>Touch targets</td><td>Kid mode: 56px+. Parent dashboard: 44px</td></tr>
+          <tr><td>Typography</td><td>Kid mode: Fredoka everywhere. Parent dashboard: Fredoka for headers, Inter for body/data</td></tr>
         </table></div>
       </section>
 
@@ -712,8 +721,8 @@
   const sidebar = document.getElementById('sidebar');
   const backdrop = document.getElementById('drawerBackdrop');
   const hamburger = document.getElementById('hamburgerBtn');
-  function openDrawer(){ sidebar.classList.add('open'); backdrop.classList.add('open'); }
-  function closeDrawer(){ sidebar.classList.remove('open'); backdrop.classList.remove('open'); }
+  function openDrawer(){ sidebar.classList.add('open'); backdrop.classList.add('open'); hamburger.setAttribute('aria-expanded','true'); }
+  function closeDrawer(){ sidebar.classList.remove('open'); backdrop.classList.remove('open'); hamburger.setAttribute('aria-expanded','false'); }
   hamburger.addEventListener('click', openDrawer);
   backdrop.addEventListener('click', closeDrawer);
 
