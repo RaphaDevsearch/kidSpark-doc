@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System Analysis — Notion AI → kidSpark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fredoka:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --surface:#F7F7F5; --elevated:#FFFFFF;
+    --text:#191919; --text-2:#5F5E5B; --text-3:#9B9A97;
+    --border:#EDECEA;
+    --action:#191919;
+    --ai-a:#9A6DFF; --ai-b:#6366F1;
+    --spark:#E8A100; --spark-bg:#FFF7E0;
+    --success:#2F9E44; --warning:#F0A400; --error:#E03131;
+    --code-bg:#1E1E1E; --code-bar:#2D2D2D;
+    --r-sm:4px; --r-md:8px; --r-lg:12px;
+    --sh-sm:0 1px 2px rgba(0,0,0,.05);
+    --sh-md:0 4px 12px rgba(0,0,0,.08);
+    --sh-lg:0 12px 32px rgba(0,0,0,.12);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{ scroll-behavior:smooth; }
+  body{ font-family:'Inter',system-ui,sans-serif; color:var(--text); background:var(--bg); font-size:15px; line-height:1.6; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .disp{ font-family:'Fredoka','Inter',sans-serif; }
+  a{ color:inherit; text-decoration:none; }
+  ::selection{ background:var(--spark-bg); }
+
+  /* ===== SHELL ===== */
+  .shell{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
+  @media (max-width:900px){ .shell{ grid-template-columns:1fr; } }
+
+  .sidebar{
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+    background:var(--surface); border-right:1px solid var(--border);
+    padding:20px 12px 40px;
+  }
+  /* Mobile: sidebar becomes an off-canvas drawer instead of disappearing */
+  @media (max-width:900px){
+    .sidebar{
+      position:fixed; top:0; left:0; height:100dvh; width:80%; max-width:300px; z-index:60;
+      transform:translateX(-100%); transition:transform .22s ease; box-shadow:var(--sh-lg);
+    }
+    .sidebar.open{ transform:translateX(0); }
+  }
+  .drawer-backdrop{
+    display:none; position:fixed; inset:0; background:rgba(11,13,23,.4); z-index:55;
+    opacity:0; transition:opacity .2s ease;
+  }
+  .drawer-backdrop.open{ display:block; opacity:1; }
+
+  .brand{ display:flex; align-items:center; gap:8px; padding:8px 10px 18px; }
+  .brand-mark{ width:24px; height:24px; border-radius:6px; background:var(--text); display:flex; align-items:center; justify-content:center; }
+  .brand-name{ font-weight:700; font-size:14px; }
+  .brand-sub{ font-size:11px; color:var(--text-3); margin-left:2px; }
+
+  .nav-group{ margin-top:18px; }
+  .nav-label{ font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--text-3); padding:0 10px 6px; }
+  .nav-item{
+    display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:6px;
+    font-size:13.5px; color:var(--text-2); cursor:pointer; transition:background .12s;
+  }
+  .nav-item:hover{ background:#EFEFED; color:var(--text); }
+  .nav-item.active{ background:#EAEAE8; color:var(--text); font-weight:600; }
+  .nav-num{ font-size:10.5px; color:var(--text-3); width:16px; flex-shrink:0; }
+
+  .main{ min-width:0; }
+  .topbar{
+    position:sticky; top:0; z-index:20; height:52px; display:flex; align-items:center; justify-content:space-between;
+    padding:0 40px; border-bottom:1px solid var(--border); background:rgba(255,255,255,.85); backdrop-filter:blur(8px); gap:10px;
+  }
+  @media (max-width:900px){ .topbar{ padding:0 14px; } }
+  .hamburger{
+    display:none; width:32px; height:32px; border-radius:7px; align-items:center; justify-content:center;
+    border:1px solid var(--border); background:#fff; flex-shrink:0; cursor:pointer;
+  }
+  @media (max-width:900px){ .hamburger{ display:flex; } }
+  .crumb{ font-size:13px; color:var(--text-3); display:flex; align-items:center; gap:6px; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .crumb b{ color:var(--text); font-weight:600; }
+  @media (max-width:640px){ .crumb span{ display:none; } .crumb b{ font-size:12.5px; } }
+  .pill{ font-size:12px; padding:5px 10px; border:1px solid var(--border); border-radius:100px; color:var(--text-2); flex-shrink:0; white-space:nowrap; }
+  @media (max-width:480px){ .pill{ display:none; } }
+
+  .content{ max-width:820px; margin:0 auto; padding:56px 40px 120px; }
+  @media (max-width:640px){ .content{ padding:32px 18px 80px; } }
+  @media (max-width:380px){ .content{ padding:28px 14px 70px; } }
+
+  .doc-title{ font-size:clamp(26px,7vw,38px); font-weight:800; letter-spacing:-.01em; margin-bottom:10px; line-height:1.12; }
+  .doc-sub{ font-size:15.5px; color:var(--text-2); max-width:640px; margin-bottom:28px; }
+
+  .callout{
+    display:flex; gap:12px; background:var(--spark-bg); border:1px solid #F0DBA0; border-radius:var(--r-md);
+    padding:16px 18px; font-size:14px; color:#6B4E00; margin-bottom:48px; line-height:1.6;
+  }
+
+  section.sec{ padding:56px 0; border-top:1px solid var(--border); }
+  section.sec:first-of-type{ border-top:none; padding-top:0; }
+  .sec-eyebrow{ font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ai-b); margin-bottom:8px; }
+  .sec-title{ font-size:26px; font-weight:700; margin-bottom:16px; letter-spacing:-.01em; }
+  .sec-body{ color:var(--text-2); font-size:15px; line-height:1.7; margin-bottom:20px; }
+  .sec-body b{ color:var(--text); font-weight:600; }
+
+  /* ===== CARDS / GRID ===== */
+  .grid{ display:grid; gap:14px; }
+  .grid-2{ grid-template-columns:repeat(2,1fr); }
+  .grid-3{ grid-template-columns:repeat(3,1fr); }
+  .grid-4{ grid-template-columns:repeat(4,1fr); }
+  @media (max-width:640px){ .grid-2,.grid-3,.grid-4{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:420px){ .grid-2,.grid-3,.grid-4{ grid-template-columns:1fr; } }
+
+  .card{ background:var(--elevated); border:1px solid var(--border); border-radius:var(--r-lg); padding:18px; }
+  .card-title{ font-weight:600; font-size:14px; margin-bottom:4px; }
+  .card-desc{ font-size:13px; color:var(--text-2); line-height:1.55; }
+
+  /* ===== SWATCHES ===== */
+  .swatch{ border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:#fff; }
+  .swatch-fill{ height:64px; }
+  .swatch-meta{ padding:10px 12px; }
+  .swatch-name{ font-size:12.5px; font-weight:600; }
+  .swatch-hex{ font-size:11.5px; color:var(--text-3); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+
+  /* ===== TYPE SCALE ===== */
+  .type-row{ display:flex; align-items:baseline; justify-content:space-between; gap:24px; padding:16px 0; border-bottom:1px solid var(--border); }
+  .type-row:last-child{ border-bottom:none; }
+  .type-meta{ font-size:12px; color:var(--text-3); font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+
+  /* ===== SPACING BARS ===== */
+  .space-row{ display:flex; align-items:center; gap:16px; padding:8px 0; }
+  .space-bar{ height:10px; background:var(--ai-b); border-radius:3px; }
+  .space-label{ width:110px; font-size:12.5px; font-family:'JetBrains Mono',monospace; color:var(--text-2); flex-shrink:0; }
+  .space-px{ font-size:12px; color:var(--text-3); }
+
+  /* ===== WIREFRAME ===== */
+  .wireframe{ border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; background:#FAFAF9; }
+  .wf-top{ height:36px; background:#fff; border-bottom:1px dashed #C9C7C2; display:flex; align-items:center; padding:0 14px; font-size:10.5px; color:var(--text-3); font-family:'JetBrains Mono',monospace; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .wf-body{ display:grid; grid-template-columns:130px 1fr; min-height:220px; }
+  @media (max-width:520px){ .wf-body{ grid-template-columns:1fr; min-height:auto; } }
+  .wf-side{ background:#F0F0EE; border-right:1px dashed #C9C7C2; padding:12px; font-size:11px; color:var(--text-3); font-family:'JetBrains Mono',monospace; }
+  @media (max-width:520px){ .wf-side{ border-right:none; border-bottom:1px dashed #C9C7C2; } }
+  .wf-side div{ padding:5px 0; }
+  .wf-main{ display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; padding:20px; }
+  .wf-main-box{ width:70%; height:14px; background:#E4E3DF; border-radius:3px; }
+  .wf-main-box.title{ width:45%; height:20px; background:#D8D7D2; }
+  .wf-tag{ font-size:11px; color:var(--text-3); font-family:'JetBrains Mono',monospace; margin-top:10px; text-align:center; }
+
+  /* ===== EDITOR / CODE ===== */
+  .editor{ border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--sh-md); margin:20px 0; }
+  .editor-bar{ background:var(--code-bar); display:flex; align-items:center; justify-content:space-between; padding:9px 14px; }
+  .editor-dots{ display:flex; gap:6px; }
+  .editor-dots span{ width:10px; height:10px; border-radius:50%; display:block; }
+  .dot-r{ background:#FF5F56; } .dot-y{ background:#FFBD2E; } .dot-g{ background:#27C93F; }
+  .editor-file{ font-size:12px; color:#9B9B9B; font-family:'JetBrains Mono',monospace; }
+  .editor-lang{ font-size:10.5px; color:#7A7A7A; background:#3A3A3A; padding:2px 8px; border-radius:4px; }
+  .editor-body{ background:var(--code-bg); padding:16px 20px; overflow-x:auto; }
+  .editor-body pre{ margin:0; }
+  .editor-body code{ font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.7; color:#D4D4D4; white-space:pre; }
+  .c-comment{ color:#6A9955; }
+  .c-prop{ color:#9CDCFE; }
+  .c-val{ color:#CE9178; }
+  .c-key{ color:#569CD6; }
+  .c-punc{ color:#D4D4D4; }
+  .c-sel{ color:#D7BA7D; }
+
+  /* ===== STATE ROW (components) ===== */
+  .state-row{ display:flex; flex-wrap:wrap; gap:12px; margin:14px 0 24px; }
+  .state-item{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .state-label{ font-size:11px; color:var(--text-3); font-family:'JetBrains Mono',monospace; }
+
+  .btn{ height:34px; padding:0 16px; border-radius:var(--r-md); font-size:13.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .btn-default{ background:var(--action); color:#fff; }
+  .btn-default:hover{ opacity:.88; }
+  .btn-hover{ background:var(--action); color:#fff; opacity:.88; }
+  .btn-active{ background:#000; color:#fff; transform:scale(.97); }
+  .btn-disabled{ background:#E4E3DF; color:#B3B1AC; cursor:not-allowed; }
+
+  .sb-item{ height:34px; padding:0 14px; border-radius:var(--r-md); font-size:13.5px; display:flex; align-items:center; gap:8px; width:140px; color:var(--text-2); }
+  .sb-default{ background:transparent; }
+  .sb-hover{ background:#EFEFED; color:var(--text); }
+  .sb-active{ background:#EAEAE8; color:var(--text); font-weight:600; }
+  .sb-focus{ background:transparent; box-shadow:0 0 0 2px #6366F1; }
+
+  /* ===== ICON ROW ===== */
+  .icon-row{ display:flex; gap:28px; align-items:center; flex-wrap:wrap; margin:14px 0 24px; }
+  .icon-item{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .icon-box{ width:44px; height:44px; border:1px solid var(--border); border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; }
+
+  /* ===== BORDER/RADIUS/SHADOW ROW ===== */
+  .token-row{ display:flex; gap:16px; flex-wrap:wrap; margin:14px 0 24px; }
+  .token-box{ width:64px; height:64px; background:#fff; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:10.5px; color:var(--text-3); font-family:'JetBrains Mono',monospace; }
+
+  /* ===== TABLE ===== */
+  .table-scroll{ overflow-x:auto; margin:14px 0 26px; -webkit-overflow-scrolling:touch; }
+  .table-scroll table{ margin:0; min-width:480px; }
+  table{ width:100%; border-collapse:collapse; margin:14px 0 26px; font-size:13.5px; }
+  th{ text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--text-3); padding:8px 12px; border-bottom:1px solid var(--border); }
+  td{ padding:12px; border-bottom:1px solid var(--border); color:var(--text-2); vertical-align:top; }
+  tr td:first-child{ color:var(--text); font-weight:600; white-space:nowrap; }
+  @media (max-width:640px){ th,td{ padding:9px 10px; font-size:12.5px; } }
+
+  /* ===== MOBILE PREVIEW (phone frames) ===== */
+  .preview-row{ display:flex; gap:22px; flex-wrap:wrap; margin:18px 0 8px; }
+  .phone{
+    width:230px; border-radius:26px; background:#0B0D17; padding:10px; box-shadow:var(--sh-lg); flex-shrink:0;
+  }
+  .phone-notch{ width:70px; height:16px; background:#0B0D17; border-radius:0 0 10px 10px; margin:0 auto 6px; position:relative; }
+  .phone-screen{ background:#fff; border-radius:16px; overflow:hidden; height:400px; display:flex; flex-direction:column; }
+  .phone-caption{ text-align:center; font-size:12px; color:var(--text-3); margin-top:10px; font-family:'JetBrains Mono',monospace; }
+
+  .pv-topbar{ height:38px; display:flex; align-items:center; justify-content:space-between; padding:0 10px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .pv-ham{ width:22px; height:22px; border-radius:5px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; }
+  .pv-title{ font-size:10.5px; font-weight:600; }
+  .pv-dot{ width:16px; height:16px; border-radius:4px; background:var(--text); display:flex; align-items:center; justify-content:center; }
+
+  .pv-body{ flex:1; padding:14px 12px; overflow:hidden; position:relative; }
+  .pv-eyebrow{ font-size:8.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ai-b); margin-bottom:6px; }
+  .pv-h1{ font-size:17px; font-weight:800; line-height:1.15; margin-bottom:6px; }
+  .pv-sub{ font-size:9.5px; color:var(--text-2); line-height:1.5; margin-bottom:10px; }
+  .pv-callout{ background:var(--spark-bg); border:1px solid #F0DBA0; border-radius:6px; padding:8px 9px; font-size:8.5px; color:#6B4E00; margin-bottom:10px; line-height:1.5; }
+  .pv-card{ border:1px solid var(--border); border-radius:8px; padding:8px; margin-bottom:8px; }
+  .pv-card-title{ font-size:10px; font-weight:600; margin-bottom:2px; }
+  .pv-card-desc{ font-size:8.5px; color:var(--text-2); }
+  .pv-grid{ display:grid; grid-template-columns:1fr; gap:6px; }
+
+  /* drawer-open illustration */
+  .pv-drawer{ position:absolute; top:0; left:0; bottom:0; width:78%; background:var(--surface); border-right:1px solid var(--border); padding:12px 10px; z-index:2; }
+  .pv-drawer-item{ font-size:9px; padding:6px 8px; border-radius:5px; color:var(--text-2); margin-bottom:2px; }
+  .pv-drawer-item.active{ background:#EAEAE8; color:var(--text); font-weight:600; }
+  .pv-drawer-label{ font-size:7.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-3); font-weight:700; margin:10px 0 4px; }
+  .pv-backdrop{ position:absolute; inset:0; background:rgba(11,13,23,.35); z-index:1; }
+
+  /* ===== TREE (sitemap) ===== */
+  .tree{ font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:18px 20px; line-height:2; color:var(--text-2); }
+  .tree b{ color:var(--text); }
+  .tree .l1{ padding-left:0; } .tree .l2{ padding-left:20px; } .tree .l3{ padding-left:40px; }
+
+  /* ===== SPLIT (section 20) ===== */
+  .split{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:14px 0 8px; }
+  @media (max-width:640px){ .split{ grid-template-columns:1fr; } }
+  .split-panel{ border-radius:var(--r-lg); overflow:hidden; border:1px solid var(--border); }
+  .split-head{ padding:14px 16px; font-weight:700; font-size:13.5px; }
+  .split-body{ padding:16px; font-size:13px; line-height:1.6; }
+  .kid-panel .split-head{ background:linear-gradient(135deg,#0B0D17,#16193B); color:#fff; }
+  .kid-panel .split-body{ background:#fff; color:var(--text-2); }
+  .kid-dot{ width:8px; height:8px; border-radius:50%; background:#FFB800; display:inline-block; margin-right:6px; }
+  .parent-panel .split-head{ background:var(--surface); color:var(--text); border-bottom:1px solid var(--border); }
+  .parent-panel .split-body{ background:#fff; color:var(--text-2); }
+  .parent-dot{ width:8px; height:8px; border-radius:50%; background:var(--ai-b); display:inline-block; margin-right:6px; }
+
+  .final-spec{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:24px; }
+  @media (max-width:480px){ .final-spec{ padding:16px; } }
+  .fs-row{ display:grid; grid-template-columns:160px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:13.5px; }
+  @media (max-width:480px){ .fs-row{ grid-template-columns:1fr; gap:4px; } }
+  .fs-row:last-child{ border-bottom:none; }
+  .fs-key{ font-weight:600; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--ai-b); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="brand-mark"><svg width="12" height="12" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2L14 9L21 11L14 13L12 20L10 13L3 11L10 9L12 2Z"/></svg></span>
+      <span class="brand-name">kidSpark</span>
+      <span class="brand-sub">/ Design Docs</span>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Foundations</div>
+      <div class="nav-item" data-target="s1"><span class="nav-num">01</span>Philosophy</div>
+      <div class="nav-item" data-target="s3"><span class="nav-num">03</span>Visual Hierarchy</div>
+      <div class="nav-item" data-target="s4"><span class="nav-num">04</span>Spacing</div>
+      <div class="nav-item" data-target="s5"><span class="nav-num">05</span>Typography</div>
+      <div class="nav-item" data-target="s6"><span class="nav-num">06</span>Color System</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Layout &amp; structure</div>
+      <div class="nav-item" data-target="s2"><span class="nav-num">02</span>Page Layout</div>
+      <div class="nav-item" data-target="s9"><span class="nav-num">09</span>Responsive</div>
+      <div class="nav-item" data-target="s15"><span class="nav-num">15</span>Information Arch.</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Components</div>
+      <div class="nav-item" data-target="s7"><span class="nav-num">07</span>Components &amp; States</div>
+      <div class="nav-item" data-target="s10"><span class="nav-num">10</span>Interaction</div>
+      <div class="nav-item" data-target="s11"><span class="nav-num">11</span>Iconography</div>
+      <div class="nav-item" data-target="s12"><span class="nav-num">12</span>Border / Shadow</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">System</div>
+      <div class="nav-item" data-target="s13"><span class="nav-num">13</span>Design Tokens</div>
+      <div class="nav-item" data-target="s14"><span class="nav-num">14</span>Patterns</div>
+      <div class="nav-item" data-target="s16"><span class="nav-num">16</span>Accessibility</div>
+      <div class="nav-item" data-target="s17"><span class="nav-num">17</span>Implementation</div>
+      <div class="nav-item" data-target="s18"><span class="nav-num">18</span>Structure / Style / Behavior</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Summary</div>
+      <div class="nav-item" data-target="s19"><span class="nav-num">19</span>Final Spec</div>
+      <div class="nav-item" data-target="s20"><span class="nav-num">20</span>kidSpark Adaptation</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="hamburger" id="hamburgerBtn" aria-label="Open navigation">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </div>
+      <div class="crumb">kidSpark <span>/</span> Design System <span>/</span> <b>Notion AI Analysis</b></div>
+      <div class="pill">Internal reference</div>
+    </div>
+
+    <div class="content">
+      <div class="sec-eyebrow">Design system reverse-engineering</div>
+      <h1 class="doc-title">Notion AI — analyzed for kidSpark</h1>
+      <p class="doc-sub">A full breakdown of Notion AI's design decisions, translated into reusable tokens and adapted into working principles for kidSpark's parent dashboard.</p>
+
+      <div class="callout">
+        ✦ <div><b>Framing note:</b> Notion AI's palette is neutral because its audience is adults doing focused work. kidSpark's marketing site and kid-facing app stay warm and playful — this analysis is adapted specifically for the <b>parent dashboard</b>, the one surface in kidSpark where a calm, restrained UI is the right choice.</div>
+      </div>
+
+      <!-- MOBILE PREVIEW -->
+      <section class="sec" style="border-top:none; padding-top:0;">
+        <div class="sec-eyebrow">Responsive behavior</div>
+        <h2 class="sec-title">How this doc looks on mobile</h2>
+        <p class="sec-body">Under 900px the sidebar becomes an off-canvas drawer instead of disappearing — triggered by the hamburger icon in the top bar, closes on backdrop tap or on picking a section.</p>
+
+        <div class="preview-row">
+          <div>
+            <div class="phone">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="pv-topbar">
+                  <div class="pv-ham"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
+                  <div class="pv-title">Notion AI Analysis</div>
+                  <div class="pv-dot"></div>
+                </div>
+                <div class="pv-body">
+                  <div class="pv-eyebrow">Design system</div>
+                  <div class="pv-h1">Notion AI — analyzed for kidSpark</div>
+                  <div class="pv-sub">A full breakdown of Notion AI's design decisions, adapted for kidSpark.</div>
+                  <div class="pv-callout">✦ Framing note: adapted specifically for the parent dashboard.</div>
+                  <div class="pv-grid">
+                    <div class="pv-card"><div class="pv-card-title">Personality</div><div class="pv-card-desc">Quiet, precise, unhurried</div></div>
+                    <div class="pv-card"><div class="pv-card-title">Density</div><div class="pv-card-desc">Low by default, expandable</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-caption">Default — drawer closed</div>
+          </div>
+
+          <div>
+            <div class="phone">
+              <div class="phone-notch"></div>
+              <div class="phone-screen" style="position:relative;">
+                <div class="pv-topbar">
+                  <div class="pv-ham"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
+                  <div class="pv-title">Notion AI Analysis</div>
+                  <div class="pv-dot"></div>
+                </div>
+                <div class="pv-body" style="padding:0;">
+                  <div class="pv-backdrop"></div>
+                  <div class="pv-drawer">
+                    <div style="font-size:10px; font-weight:700; margin-bottom:10px;">✦ kidSpark</div>
+                    <div class="pv-drawer-label">Foundations</div>
+                    <div class="pv-drawer-item active">01 Philosophy</div>
+                    <div class="pv-drawer-item">03 Visual Hierarchy</div>
+                    <div class="pv-drawer-item">04 Spacing</div>
+                    <div class="pv-drawer-item">05 Typography</div>
+                    <div class="pv-drawer-label">Layout &amp; structure</div>
+                    <div class="pv-drawer-item">02 Page Layout</div>
+                    <div class="pv-drawer-item">09 Responsive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-caption">Nav open — off-canvas drawer</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1. PHILOSOPHY -->
+      <section class="sec" id="s1">
+        <div class="sec-eyebrow">01 — Foundations</div>
+        <h2 class="sec-title">Design Philosophy</h2>
+        <p class="sec-body">Notion AI's core idea is the <b>invisible interface</b> — the tool disappears so nothing competes with the content. Target users are knowledge workers doing focused cognitive work. The visual tone is monochrome-first: color is spent only on meaning, never decoration.</p>
+        <div class="grid grid-4">
+          <div class="card"><div class="card-title">Personality</div><div class="card-desc">Quiet, precise, unhurried</div></div>
+          <div class="card"><div class="card-title">Density</div><div class="card-desc">Low by default, expandable on demand</div></div>
+          <div class="card"><div class="card-title">Character</div><div class="card-desc">Minimalist shell, maximalist depth</div></div>
+          <div class="card"><div class="card-title">Reusable rule</div><div class="card-desc">Hide power behind restraint</div></div>
+        </div>
+      </section>
+
+      <!-- 2. LAYOUT -->
+      <section class="sec" id="s2">
+        <div class="sec-eyebrow">02 — Layout &amp; structure</div>
+        <h2 class="sec-title">Page Layout</h2>
+        <p class="sec-body">Fixed sidebar, single scrolling main column, no permanent right panel. Content is centered with a max-width — never edge-to-edge.</p>
+        <div class="wireframe">
+          <div class="wf-top">TOP BAR — breadcrumb · share · icons (48px)</div>
+          <div class="wf-body">
+            <div class="wf-side">
+              <div>▸ Home</div><div>▸ Search</div><div style="color:var(--text-2); font-weight:600;">▸ Private</div>
+              <div>&nbsp;&nbsp;— Page A</div><div>&nbsp;&nbsp;— Page B</div><div>▸ Shared</div>
+              <div style="margin-top:12px; color:var(--text-3);">SIDEBAR<br>240–280px</div>
+            </div>
+            <div class="wf-main">
+              <div class="wf-main-box title"></div>
+              <div class="wf-main-box"></div>
+              <div class="wf-main-box" style="width:55%;"></div>
+              <div class="wf-tag">MAIN CONTENT — centered, max-width ~900px</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. HIERARCHY -->
+      <section class="sec" id="s3">
+        <div class="sec-eyebrow">03 — Foundations</div>
+        <h2 class="sec-title">Visual Hierarchy</h2>
+        <p class="sec-body">Built almost entirely through <b>size and weight</b>, not color — so when color does appear, it reads instantly as meaningful.</p>
+        <div class="table-scroll"><table>
+          <tr><th>Order</th><th>Element</th><th>Mechanism</th></tr>
+          <tr><td>1st</td><td>Page title</td><td>Largest text, bold, dark</td></tr>
+          <tr><td>2nd</td><td>Active content</td><td>Normal weight + cursor position</td></tr>
+          <tr><td>3rd</td><td>Inline AI suggestion</td><td>Subtle tinted block, not shouted color</td></tr>
+          <tr><td>4th</td><td>Sidebar selection</td><td>Light gray fill, no border/shadow</td></tr>
+          <tr><td>5th</td><td>Metadata / icons</td><td>Small, low-contrast gray</td></tr>
+        </table></div>
+      </section>
+
+      <!-- 4. SPACING -->
+      <section class="sec" id="s4">
+        <div class="sec-eyebrow">04 — Foundations</div>
+        <h2 class="sec-title">Spacing System</h2>
+        <p class="sec-body">A 4px base unit scaling through a classic 4/8 rhythm.</p>
+        <div>
+          <div class="space-row"><div class="space-label">xs</div><div class="space-bar" style="width:4px;"></div><div class="space-px">4px</div></div>
+          <div class="space-row"><div class="space-label">sm</div><div class="space-bar" style="width:8px;"></div><div class="space-px">8px</div></div>
+          <div class="space-row"><div class="space-label">md</div><div class="space-bar" style="width:12px;"></div><div class="space-px">12px</div></div>
+          <div class="space-row"><div class="space-label">lg</div><div class="space-bar" style="width:16px;"></div><div class="space-px">16px</div></div>
+          <div class="space-row"><div class="space-label">xl</div><div class="space-bar" style="width:24px;"></div><div class="space-px">24px</div></div>
+          <div class="space-row"><div class="space-label">2xl</div><div class="space-bar" style="width:32px;"></div><div class="space-px">32px</div></div>
+          <div class="space-row"><div class="space-label">3xl</div><div class="space-bar" style="width:48px;"></div><div class="space-px">48px</div></div>
+        </div>
+      </section>
+
+      <!-- 5. TYPOGRAPHY -->
+      <section class="sec" id="s5">
+        <div class="sec-eyebrow">05 — Foundations</div>
+        <h2 class="sec-title">Typography Scale</h2>
+        <p class="sec-body">Inter throughout. Fewer scale steps than most systems — weight carries more hierarchy than size.</p>
+        <div>
+          <div class="type-row"><div style="font-weight:700; font-size:36px;">Page title</div><div class="type-meta">h1 · 36px / 700 / 1.2</div></div>
+          <div class="type-row"><div style="font-weight:600; font-size:24px;">Section heading</div><div class="type-meta">h2 · 24px / 600 / 1.3</div></div>
+          <div class="type-row"><div style="font-weight:600; font-size:19px;">Subheading</div><div class="type-meta">h3 · 19px / 600 / 1.4</div></div>
+          <div class="type-row"><div style="font-weight:400; font-size:15px;">Body text reads at fifteen to sixteen pixels</div><div class="type-meta">body · 15px / 400 / 1.6</div></div>
+          <div class="type-row"><div style="font-weight:500; font-size:12px; color:var(--text-3);">Caption / metadata label</div><div class="type-meta">caption · 12px / 500 / 1.4</div></div>
+        </div>
+      </section>
+
+      <!-- 6. COLOR -->
+      <section class="sec" id="s6">
+        <div class="sec-eyebrow">06 — Foundations</div>
+        <h2 class="sec-title">Color System</h2>
+        <p class="sec-body">Color as a <b>signal channel</b>. The primary action color isn't even a brand color — it's ink. Only the AI accent stays consistently saturated.</p>
+        <div class="grid grid-4">
+          <div class="swatch"><div class="swatch-fill" style="background:#FFFFFF; border-bottom:1px solid var(--border);"></div><div class="swatch-meta"><div class="swatch-name">Background</div><div class="swatch-hex">#FFFFFF</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#F7F7F5;"></div><div class="swatch-meta"><div class="swatch-name">Surface</div><div class="swatch-hex">#F7F7F5</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#191919;"></div><div class="swatch-meta"><div class="swatch-name">Text primary</div><div class="swatch-hex">#191919</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#5F5E5B;"></div><div class="swatch-meta"><div class="swatch-name">Text secondary</div><div class="swatch-hex">#5F5E5B</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#9B9A97;"></div><div class="swatch-meta"><div class="swatch-name">Text muted</div><div class="swatch-hex">#9B9A97</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#EDECEA;"></div><div class="swatch-meta"><div class="swatch-name">Border</div><div class="swatch-hex">#EDECEA</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:linear-gradient(135deg,#9A6DFF,#6366F1);"></div><div class="swatch-meta"><div class="swatch-name">AI accent</div><div class="swatch-hex">#9A6DFF → #6366F1</div></div></div>
+          <div class="swatch"><div class="swatch-fill" style="background:#2F9E44;"></div><div class="swatch-meta"><div class="swatch-name">Success</div><div class="swatch-hex">#2F9E44</div></div></div>
+        </div>
+      </section>
+
+      <!-- 7-8 COMPONENTS -->
+      <section class="sec" id="s7">
+        <div class="sec-eyebrow">07–08 — Components</div>
+        <h2 class="sec-title">Component States</h2>
+        <p class="sec-body"><b>Button</b> — dark fill, opacity shift on hover, scale dip on active, flat gray when disabled.</p>
+        <div class="state-row">
+          <div class="state-item"><div class="btn btn-default">Continue</div><div class="state-label">default</div></div>
+          <div class="state-item"><div class="btn btn-hover">Continue</div><div class="state-label">hover</div></div>
+          <div class="state-item"><div class="btn btn-active">Continue</div><div class="state-label">active</div></div>
+          <div class="state-item"><div class="btn btn-disabled">Continue</div><div class="state-label">disabled</div></div>
+        </div>
+        <p class="sec-body"><b>Sidebar item</b> — transparent → light fill on hover → darker fill + bold when selected.</p>
+        <div class="state-row">
+          <div class="state-item"><div class="sb-item sb-default">◷ Dashboard</div><div class="state-label">default</div></div>
+          <div class="state-item"><div class="sb-item sb-hover">◷ Dashboard</div><div class="state-label">hover</div></div>
+          <div class="state-item"><div class="sb-item sb-active">◷ Dashboard</div><div class="state-label">active</div></div>
+          <div class="state-item"><div class="sb-item sb-focus">◷ Dashboard</div><div class="state-label">focus (keyboard)</div></div>
+        </div>
+      </section>
+
+      <!-- 9. RESPONSIVE -->
+      <section class="sec" id="s9">
+        <div class="sec-eyebrow">09 — Layout &amp; structure</div>
+        <h2 class="sec-title">Responsive Behavior</h2>
+        <div class="table-scroll"><table>
+          <tr><th>Breakpoint</th><th>Sidebar</th><th>Content</th></tr>
+          <tr><td>Desktop &gt;1024px</td><td>Persistent, 240–280px</td><td>Centered column, generous margins</td></tr>
+          <tr><td>Tablet 768–1024px</td><td>Collapsible overlay</td><td>Expands to fill</td></tr>
+          <tr><td>Mobile &lt;768px</td><td>Hidden, full-screen drawer</td><td>Full width, 16px edge padding</td></tr>
+        </table></div>
+      </section>
+
+      <!-- 10 INTERACTION -->
+      <section class="sec" id="s10">
+        <div class="sec-eyebrow">10 — Components</div>
+        <h2 class="sec-title">Interaction Design</h2>
+        <p class="sec-body">Hover fills are near-instant with no movement. AI generation is shown as literal streaming text at the cursor — the content <i>is</i> the progress indicator, no spinner needed. Transitions stay short: 120–180ms, ease-out.</p>
+      </section>
+
+      <!-- 11 ICONS -->
+      <section class="sec" id="s11">
+        <div class="sec-eyebrow">11 — Components</div>
+        <h2 class="sec-title">Iconography</h2>
+        <p class="sec-body">Line icons, 1.5–2px stroke, rounded joins. Inherit text color rather than carrying their own fixed color.</p>
+        <div class="icon-row">
+          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.75"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></div><div class="state-label">16–20px</div></div>
+          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.75"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="state-label">1.75px stroke</div></div>
+          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.75"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><div class="state-label">rounded joins</div></div>
+          <div class="icon-item"><div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.75"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="state-label">inherits text color</div></div>
+        </div>
+        <p class="sec-body">Recommended library for implementation: <b>Lucide</b> — closest match to this stroke-based, quiet style.</p>
+      </section>
+
+      <!-- 12 BORDER/RADIUS/SHADOW -->
+      <section class="sec" id="s12">
+        <div class="sec-eyebrow">12 — Components</div>
+        <h2 class="sec-title">Borders, Radius, Shadows</h2>
+        <p class="sec-body">Elevation is built with <b>borders first, shadow only for genuinely floating elements</b> — 90% of components rest with no shadow at all.</p>
+        <div class="token-row">
+          <div class="token-box" style="border-radius:4px;">radius sm</div>
+          <div class="token-box" style="border-radius:8px;">radius md</div>
+          <div class="token-box" style="border-radius:12px;">radius lg</div>
+          <div class="token-box" style="border-radius:8px; box-shadow:var(--sh-sm); border:none;">shadow sm</div>
+          <div class="token-box" style="border-radius:8px; box-shadow:var(--sh-md); border:none;">shadow md</div>
+          <div class="token-box" style="border-radius:8px; box-shadow:var(--sh-lg); border:none;">shadow lg</div>
+        </div>
+      </section>
+
+      <!-- 13 TOKENS -->
+      <section class="sec" id="s13">
+        <div class="sec-eyebrow">13 — System</div>
+        <h2 class="sec-title">Design Tokens</h2>
+        <p class="sec-body">The full token set as implementation-ready CSS custom properties.</p>
+        <div class="editor">
+          <div class="editor-bar">
+            <div class="editor-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <div class="editor-file">tokens.css</div>
+            <div class="editor-lang">CSS</div>
+          </div>
+          <div class="editor-body"><pre><code><span class="c-sel">:root</span> {
+  <span class="c-comment">/* Color */</span>
+  <span class="c-prop">--color-bg</span>: <span class="c-val">#FFFFFF</span>;
+  <span class="c-prop">--color-surface</span>: <span class="c-val">#F7F7F5</span>;
+  <span class="c-prop">--color-text-primary</span>: <span class="c-val">#191919</span>;
+  <span class="c-prop">--color-text-secondary</span>: <span class="c-val">#5F5E5B</span>;
+  <span class="c-prop">--color-border</span>: <span class="c-val">#EDECEA</span>;
+  <span class="c-prop">--color-action-primary</span>: <span class="c-val">#191919</span>;
+  <span class="c-prop">--color-ai-accent-start</span>: <span class="c-val">#9A6DFF</span>;
+  <span class="c-prop">--color-ai-accent-end</span>: <span class="c-val">#6366F1</span>;
+
+  <span class="c-comment">/* Spacing */</span>
+  <span class="c-prop">--space-xs</span>: <span class="c-val">4px</span>;
+  <span class="c-prop">--space-sm</span>: <span class="c-val">8px</span>;
+  <span class="c-prop">--space-md</span>: <span class="c-val">12px</span>;
+  <span class="c-prop">--space-lg</span>: <span class="c-val">16px</span>;
+  <span class="c-prop">--space-xl</span>: <span class="c-val">24px</span>;
+  <span class="c-prop">--space-2xl</span>: <span class="c-val">32px</span>;
+
+  <span class="c-comment">/* Typography */</span>
+  <span class="c-prop">--font-family</span>: <span class="c-key">'Inter'</span>, system-ui, sans-serif;
+  <span class="c-prop">--text-h1</span>: <span class="c-val">700 36px/1.2</span> var(--font-family);
+  <span class="c-prop">--text-body</span>: <span class="c-val">400 15px/1.6</span> var(--font-family);
+
+  <span class="c-comment">/* Radius + shadow */</span>
+  <span class="c-prop">--radius-md</span>: <span class="c-val">8px</span>;
+  <span class="c-prop">--shadow-md</span>: <span class="c-val">0 4px 12px rgba(0,0,0,0.08)</span>;
+}</code></pre></div>
+        </div>
+      </section>
+
+      <!-- 14 PATTERNS -->
+      <section class="sec" id="s14">
+        <div class="sec-eyebrow">14 — System</div>
+        <h2 class="sec-title">Design Patterns</h2>
+        <div class="table-scroll"><table>
+          <tr><th>Pattern</th><th>kidSpark usage</th></tr>
+          <tr><td>Sidebar nav</td><td>Parent dashboard — children, subjects, settings</td></tr>
+          <tr><td>Inline "/" trigger</td><td>"Ask kidSpark" weekly-summary helper for parents</td></tr>
+          <tr><td>Slide-in panel</td><td>Lesson detail opening without leaving context</td></tr>
+          <tr><td>Streaming text</td><td>AI parent-report generation, inline not modal</td></tr>
+          <tr><td>Empty state</td><td>"No activity yet this week" dashboard state</td></tr>
+        </table></div>
+      </section>
+
+      <!-- 15 IA -->
+      <section class="sec" id="s15">
+        <div class="sec-eyebrow">15 — Layout &amp; structure</div>
+        <h2 class="sec-title">Information Architecture</h2>
+        <p class="sec-body">Sidebar mirrors the content hierarchy exactly — one mental model for the whole product.</p>
+        <div class="tree">
+          <div class="l1"><b>kidSpark</b> (app)</div>
+          <div class="l2">├── Dashboard <span style="color:var(--text-3);">(default landing)</span></div>
+          <div class="l2">├── Children</div>
+          <div class="l3">│　　├── Child A → progress, streaks, sparks</div>
+          <div class="l3">│　　└── Child B → …</div>
+          <div class="l2">├── Adventures Library</div>
+          <div class="l2">├── Reports</div>
+          <div class="l2">└── Settings</div>
+          <div class="l3">　　　├── Account</div>
+          <div class="l3">　　　├── Screen-time limits</div>
+          <div class="l3">　　　└── Privacy &amp; safety</div>
+        </div>
+      </section>
+
+      <!-- 16 A11Y -->
+      <section class="sec" id="s16">
+        <div class="sec-eyebrow">16 — System</div>
+        <h2 class="sec-title">Accessibility</h2>
+        <div class="grid grid-2">
+          <div class="card"><div class="card-title">Contrast</div><div class="card-desc">Primary text comfortably exceeds WCAG AA; double-check muted-gray combinations</div></div>
+          <div class="card"><div class="card-title">Focus states</div><div class="card-desc">2px outline ring, offset from the element's own border</div></div>
+          <div class="card"><div class="card-title">Touch targets</div><div class="card-desc">44px minimum on kidSpark's mobile parent views (consumer app, not desktop-first)</div></div>
+          <div class="card"><div class="card-title">Screen readers</div><div class="card-desc">Icon-only buttons need explicit aria-labels</div></div>
+        </div>
+      </section>
+
+      <!-- 17 IMPLEMENTATION -->
+      <section class="sec" id="s17">
+        <div class="sec-eyebrow">17 — System</div>
+        <h2 class="sec-title">Implementation Guidance</h2>
+        <p class="sec-body">Map the token table into <span class="mono" style="background:var(--surface); padding:2px 6px; border-radius:4px;">tailwind.config.js</span> so every component pulls from one source of truth. CSS Grid for the outer shell, Flexbox within components — mobile-first breakpoints, sidebar as a drawer under 768px.</p>
+      </section>
+
+      <!-- 18 STRUCTURE/STYLE/BEHAVIOR -->
+      <section class="sec" id="s18">
+        <div class="sec-eyebrow">18 — System</div>
+        <h2 class="sec-title">Structure / Style / Behavior</h2>
+        <div class="grid grid-3">
+          <div class="card"><div class="card-title">Structure</div><div class="card-desc">Sidebar + centered main column, top bar, no persistent right panel</div></div>
+          <div class="card"><div class="card-title">Style</div><div class="card-desc">Near-monochrome, border-based separation, one reserved accent color</div></div>
+          <div class="card"><div class="card-title">Behavior</div><div class="card-desc">Hover-revealed affordances, streaming over spinners, minimal transitions</div></div>
+        </div>
+      </section>
+
+      <!-- 19 FINAL SPEC -->
+      <section class="sec" id="s19">
+        <div class="sec-eyebrow">19 — Summary</div>
+        <h2 class="sec-title">Final Design Specification</h2>
+        <div class="final-spec">
+          <div class="fs-row"><div class="fs-key">philosophy</div><div>Invisible interface — hide power behind restraint</div></div>
+          <div class="fs-row"><div class="fs-key">layout</div><div>Fixed sidebar (240–280px) + centered main column (~900px max)</div></div>
+          <div class="fs-row"><div class="fs-key">spacing_scale</div><div>4 · 8 · 12 · 16 · 24 · 32 · 48</div></div>
+          <div class="fs-row"><div class="fs-key">type_scale</div><div>h1 36/700 · h2 24/600 · h3 19/600 · body 15/400 · caption 12/500</div></div>
+          <div class="fs-row"><div class="fs-key">border_system</div><div>1px #EDECEA — primary separator, shadow reserved for floating elements</div></div>
+          <div class="fs-row"><div class="fs-key">interaction</div><div>Hover reveals, no confirm on reversible actions, streaming &gt; spinners</div></div>
+        </div>
+      </section>
+
+      <!-- 20 ADAPTATION -->
+      <section class="sec" id="s20">
+        <div class="sec-eyebrow">20 — Summary</div>
+        <h2 class="sec-title">Adapted for kidSpark</h2>
+        <p class="sec-body">kidSpark runs <b>two design languages under one brand</b> — not a clone of Notion's neutral skin everywhere.</p>
+
+        <div class="split">
+          <div class="split-panel kid-panel">
+            <div class="split-head"><span class="kid-dot"></span>Marketing site &amp; kid app</div>
+            <div class="split-body">Warm, playful, spark-themed. Fredoka display type, gold accent, night-sky visual language. Delight-driven.</div>
+          </div>
+          <div class="split-panel parent-panel">
+            <div class="split-head"><span class="parent-dot"></span>Parent dashboard</div>
+            <div class="split-body">Calm, restrained, Notion-inspired. Inter throughout, borders over shadows, one accent reserved for meaning. Get in, see status, leave.</div>
+          </div>
+        </div>
+
+        <div class="table-scroll"><table>
+          <tr><th>Notion AI principle</th><th>kidSpark adaptation</th></tr>
+          <tr><td>Hide power behind restraint</td><td>Dashboard default view stays sparse; detail lives one click deeper</td></tr>
+          <tr><td>Shadow reserved for floating elements</td><td>Kept literally — consistent with how spark-glow is already used meaningfully</td></tr>
+          <tr><td>One accent reserved for meaning</td><td>Spark-gold stays the only "achievement" signal — never decorative</td></tr>
+          <tr><td>Inline AI trigger, not a chat bubble</td><td>Weekly summary streams into the dashboard card itself</td></tr>
+          <tr><td>Sidebar mirrors IA exactly</td><td>Dashboard → Children → Library → Reports → Settings</td></tr>
+        </table></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('drawerBackdrop');
+  const hamburger = document.getElementById('hamburgerBtn');
+  function openDrawer(){ sidebar.classList.add('open'); backdrop.classList.add('open'); }
+  function closeDrawer(){ sidebar.classList.remove('open'); backdrop.classList.remove('open'); }
+  hamburger.addEventListener('click', openDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item=>{
+    item.addEventListener('click', ()=>{
+      document.getElementById(item.dataset.target)?.scrollIntoView({behavior:'smooth', block:'start'});
+      closeDrawer();
+    });
+  });
+  const sections = [...navItems].map(i=>document.getElementById(i.dataset.target)).filter(Boolean);
+  function onScroll(){
+    let current = sections[0];
+    sections.forEach(s=>{ if(window.scrollY >= s.offsetTop - 120) current = s; });
+    navItems.forEach(i=> i.classList.toggle('active', i.dataset.target === current.id));
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+</script>
+
+</body>
+</html>
