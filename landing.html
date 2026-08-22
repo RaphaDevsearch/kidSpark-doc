@@ -103,6 +103,9 @@
   nav.desktop-nav a{font-weight:500; font-size:14px; color:var(--text); opacity:.8; transition:opacity 150ms, color 150ms;}
   nav.desktop-nav a:hover{opacity:1; color:var(--primary);}
   .nav-right{display:flex; align-items:center; gap:var(--space-lg);}
+  .system-link{display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:13px; font-weight:600; transition:color 150ms ease-out;}
+  .system-link:hover{color:var(--primary);}
+  .system-link svg{width:15px; height:15px;}
 
   .hamburger{display:none;}
 
@@ -335,6 +338,10 @@
       <a href="#future">Future Vision</a>
     </nav>
     <div class="nav-right">
+      <a href="index.html" class="system-link" aria-label="Open the kidSpark design system">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>
+        Design system
+      </a>
       <a href="#get-started" class="btn small">Get Started</a>
     </div>
   </div>
@@ -344,7 +351,7 @@
 <nav class="bottom-nav" id="bottomNav" aria-label="Primary">
   <ul>
     <li data-section="hero" class="active">
-      <a href="#">
+      <a href="#hero">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/></svg>
         <span>Home</span>
       </a>
@@ -606,7 +613,7 @@
         </div>
         <h3>Alphabet &amp; Number Learning Zone</h3>
         <p>Interactive letter and number recognition, matching, drawing, and learn-by-doing activities.</p>
-        <a href="#" class="module-cta">Explore &amp; Learn <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="#what" class="module-cta">Explore &amp; Learn <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>
 
       <div class="module-card reveal">
@@ -616,7 +623,7 @@
         </div>
         <h3>Truth or Dare</h3>
         <p>A playful speaking and values experience — honesty, confidence, public speaking and cultural awareness.</p>
-        <a href="#" class="module-cta">Speak &amp; Discover <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="#why" class="module-cta">Speak &amp; Discover <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>
 
       <div class="module-card reveal">
@@ -626,7 +633,7 @@
         </div>
         <h3>Quiz &amp; Puzzle Zone</h3>
         <p>Interactive quizzes, memory games, jigsaw activities and subject-based challenges — earn stars and badges.</p>
-        <a href="#" class="module-cta">Challenge Yourself <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="#how-it-works" class="module-cta">Challenge Yourself <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>
 
       <div class="module-card reveal">
@@ -636,7 +643,7 @@
         </div>
         <h3>Creative Play Lab</h3>
         <p>Drawing, shapes, logic puzzles and creative exploration for beginner problem-solving.</p>
-        <a href="#" class="module-cta">Create Something <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="#experience" class="module-cta">Create Something <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>
 
       <div class="module-card reveal">
@@ -646,7 +653,7 @@
         </div>
         <h3>Parent Skill Tracker</h3>
         <p>A simple parent dashboard showing what a child learned, practiced, mastered and achieved.</p>
-        <a href="#" class="module-cta">See Their Growth <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="index.html#s20" class="module-cta">See Their Growth <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>
     </div>
   </div>
@@ -839,7 +846,7 @@
     <h2>Every Child Has a Spark.</h2>
     <p>Give curiosity a place to grow. KidSpark turns everyday screen time into opportunities to learn, create, communicate and discover.</p>
     <div class="btn-row">
-      <a href="#" class="btn on-dark">Start the Spark</a>
+      <a href="#experience" class="btn on-dark">Start the Spark</a>
       <a href="#what" class="btn ghost">Explore KidSpark</a>
     </div>
   </div>
@@ -854,12 +861,13 @@
       </div>
       <div class="footer-nav">
         <div>
-          <a href="#">Home</a>
+          <a href="#hero">Home</a>
           <a href="#what">About KidSpark</a>
           <a href="#experience">Activities</a>
         </div>
         <div>
-          <a href="#parents">Parent Dashboard</a>
+          <a href="index.html#s20">Parent Dashboard</a>
+          <a href="index.html">Design System</a>
           <a href="#future">Future Vision</a>
           <a href="#get-started">Get Started</a>
         </div>
