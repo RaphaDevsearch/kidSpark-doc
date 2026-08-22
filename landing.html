@@ -321,6 +321,13 @@
     section{padding:var(--space-2xl) 0;}
     .footer-top{flex-direction:column;}
   }
+  @media (max-width:480px){
+    .topbar .wrap{padding:0 var(--space-md);}
+    .nav-right{gap:var(--space-sm);}
+    .system-link{width:40px; height:40px; min-width:40px; justify-content:center; border:1px solid rgba(38,54,56,.15); border-radius:var(--radius-md); font-size:0;}
+    .system-link svg{width:18px; height:18px;}
+    .btn.small{padding:10px 14px; font-size:13px; min-height:40px;}
+  }
 </style>
 </head>
 <body>
@@ -338,7 +345,7 @@
       <a href="#future">Future Vision</a>
     </nav>
     <div class="nav-right">
-      <a href="index.html" class="system-link" aria-label="Open the kidSpark design system">
+      <a href="index.html" class="system-link" aria-label="Open the kidSpark design system" title="Open design system">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>
         Design system
       </a>
